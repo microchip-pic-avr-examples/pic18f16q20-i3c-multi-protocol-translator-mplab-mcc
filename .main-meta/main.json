@@ -1,0 +1,54 @@
+{
+    "metaDataVersion": "1.0.0",
+    "category": "com.microchip.ide.project",
+    "content": {
+        "metaDataVersion": "1.3.0",
+        "name": "com.microchip.mcu8.mplabx.project.pic18f16q20-i3c-multi-protocol-translator-mplab-mcc",
+        "version": " ",
+        "displayName": "",
+        "projectName": "pic18f16q20-i3c-multi-protocol-translator-mplab-mcc",
+        "shortDescription": "This code example demonstrates a multi-protocol translator using I3C Target peripheral of PIC microcontroller which converts I2C/SPI protocol into I3C protocol and vice versa. \r\n\r\nCompatible PIC18F-Q20 family of MCUs are: PIC18F06Q20, PIC18F16Q20\r\n",
+        "ide": {
+            "name": "MPLAB X",
+            "semverRange": ">=6.15.0"
+        },
+        "compiler": [
+            {
+                "name": "XC8",
+                "semverRange": "^2.45.0"
+            }
+        ],
+        "dfp": {
+            "name": "",
+            "semverRange": ""
+        },
+        "configurator": {
+            "name": "",
+            "semverRange": ""
+        },
+        "device": {
+            "metaDataVersion": "1.0.0",
+            "category": "com.microchip.portal.contentRef",
+            "content": {
+                "metaDataVersion": "1.0.0",
+                "category": "com.microchip.device",
+                "name": "PIC18F16Q20",
+                "versionRange": "*"
+            }
+        },
+        "author": "Irene Mary Abraham",
+        "peripherals": [],
+        "keywords": [],
+        "additionalData": {
+            "longDescription": {
+                "metaDataVersion": "1.0.0",
+                "category": "com.microchip.portal.fileRef",
+                "content": {
+                    "metaDataVersion": "1.0.0",
+                    "fileName": "./README.md",
+                    "mimeType": "text/markdown"
+                }
+            }
+        }
+    }
+}
