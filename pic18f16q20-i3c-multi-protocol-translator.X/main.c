@@ -11,7 +11,7 @@
 */
 
 /*
-© [2023] Microchip Technology Inc. and its subsidiaries.
+© [2024] Microchip Technology Inc. and its subsidiaries.
 
     Subject to your compliance with these terms, you may use Microchip 
     software and any derivatives exclusively with Microchip products. 
@@ -39,13 +39,11 @@ uint16_t numberOfBytesReceived;
 volatile bool isDataReceived = false;
 volatile bool isResetPatternDetected = false;
 volatile bool isInterrupt1Received = false;
-volatile bool isInterrupt2Received = false;
 enum CONTROLLER_COMMAND commandReceived;
 enum I3C_TARGET_HJ_REQUEST_ERROR hjRequestErrorState;
 
 void ResetPatternDetectedCallback(void);
-void INT1_UserInterruptHandler(void);
-void INT2_UserInterruptHandler(void);
+void INT_pin1_UserInterruptHandler(void);
 void TransactionCompleteCallback(struct I3C_TARGET_TRANSACTION_COMPLETE_STATUS *transactionCompleteStatus);
 
 /*
@@ -63,29 +61,24 @@ int main(void)
     
      //Register user custom callback
     I3C2_TransactionCompleteCallbackRegister(TransactionCompleteCallback); 
-    I3C2_ResetPatternDetectedCallbackRegister(ResetPatternDetectedCallback); 
-    INT1_Client_SetInterruptHandler(INT1_UserInterruptHandler);
-    INT2_Client_SetInterruptHandler(INT2_UserInterruptHandler);
-    
+    I3C2_ResetPatternDetectedCallbackRegister(ResetPatternDetectedCallback);
+    INT_pin1_SetInterruptHandler(INT_pin1_UserInterruptHandler);
+    SPI1_Host.TxCompleteCallbackRegister(SPI1_TxCompleteUserInterruptHandler);
+    SPI1_Host.RxCompleteCallbackRegister(SPI1_RxCompleteUserInterruptHandler);
+
     // If using interrupts in PIC18 High/Low Priority Mode you need to enable the Global High and Low Interrupts 
     // If using interrupts in PIC Mid-Range Compatibility Mode you need to enable the Global Interrupts 
     // Use the following macros to: 
 
-    // Enable the Global High Interrupts 
-    INTERRUPT_GlobalInterruptHighEnable(); 
+    // Enable the Global Interrupts 
+    //INTERRUPT_GlobalInterruptEnable(); 
 
-    // Disable the Global High Interrupts 
-    //INTERRUPT_GlobalInterruptHighDisable(); 
-
-    // Enable the Global Low Interrupts 
-    //INTERRUPT_GlobalInterruptLowEnable(); 
-
-    // Disable the Global Low Interrupts 
-    //INTERRUPT_GlobalInterruptLowDisable(); 
+    // Disable the Global Interrupts 
+    //INTERRUPT_GlobalInterruptDisable(); 
 
     __delay_ms(1000);
     debugPrinter("*****Multi-Protocol Translator using I3C*****\r\n");
-   
+    
     while(1)
     {
         switch(currentState)
@@ -121,22 +114,32 @@ int main(void)
                     {
                         case I2C_WRITE_COMMAND:      
                             debugPrinter("Command received : I2C Write \r\n");
-                            ExecuteI2CWriteCommand(receiveDataBuffer[I2C_ADDRESS_INDEX],receiveDataBuffer+2,(uint8_t)(numberOfBytesReceived-2));
+                            ExecuteI2CWriteCommand(receiveDataBuffer[I2C_ADDRESS_INDEX],receiveDataBuffer+2,numberOfBytesReceived-2);
                             break;  
                             
                         case I2C_READ_COMMAND:
                             debugPrinter("Command received : I2C Read \r\n");
-                            ExecuteI2CReadCommand(receiveDataBuffer[I2C_ADDRESS_INDEX],receiveDataBuffer[I2C_READ_BUFFER_SIZE_INDEX]);
+                            ExecuteI2CReadCommand(receiveDataBuffer[I2C_ADDRESS_INDEX],receiveDataBuffer[I2C_READ_BUFFER_SIZE_HIGH_INDEX],receiveDataBuffer[I2C_READ_BUFFER_SIZE_LOW_INDEX]);
                             break;
                             
                         case SPI_WRITE_COMMAND:                            
                             debugPrinter("Command received : SPI Write \r\n");
-                            ExecuteSPIWriteCommand(receiveDataBuffer[FUNCTION_ID_INDEX],receiveDataBuffer+1,(uint8_t)(numberOfBytesReceived-1));
+                            ExecuteSPIWriteCommand(receiveDataBuffer[FUNCTION_ID_INDEX],receiveDataBuffer+1,numberOfBytesReceived-1);
                             break;
                             
                         case SPI_READ_COMMAND:                           
                             debugPrinter("Command received : SPI Read \r\n");
-                            ExecuteSPIReadCommand(receiveDataBuffer[FUNCTION_ID_INDEX],receiveDataBuffer[SPI_READ_BUFFER_SIZE_INDEX]);
+                            ExecuteSPIReadCommand(receiveDataBuffer[FUNCTION_ID_INDEX],receiveDataBuffer[SPI_READ_BUFFER_SIZE_HIGH_INDEX], receiveDataBuffer[SPI_READ_BUFFER_SIZE_LOW_INDEX]);
+                            break;
+                            
+                        case UART_WRITE_COMMAND:
+                            debugPrinter("Command received : UART Write \r\n");
+                            ExecuteUARTWriteCommand(receiveDataBuffer[FUNCTION_ID_INDEX],receiveDataBuffer+1,numberOfBytesReceived-1);
+                            break;
+                            
+                        case UART_READ_COMMAND:
+                            debugPrinter("Command received : UART Read \r\n");
+                            ExecuteUARTReadCommand(receiveDataBuffer[FUNCTION_ID_INDEX],receiveDataBuffer[UART_READ_STOP_BYTE_INDEX]);
                             break;
                             
                         case CLIENT_RESET_COMMAND:
@@ -165,18 +168,14 @@ int main(void)
                     I3C2_NextPrivateTransactionACK();
                     debugPrinter("Ready to receive next data\r\n\n");     
                 }
-                if(isInterrupt1Received || isInterrupt2Received)  // Checking if interrupts have occurred on any client devices
+                if(isInterrupt1Received)  // Checking if interrupts have occurred on any client devices
                 {
-                    if(isInterrupt1Received)
-                    {
-                        SendAlertFromClient(0x01);
-                        isInterrupt1Received = false;
-                    }
-                    if(isInterrupt2Received)
-                    {
-                        SendAlertFromClient(0x02);
-                        isInterrupt2Received = false;
-                    }
+                    SendAlertFromClient(0x01);
+                    isInterrupt1Received = false;
+                }
+                if(UART_PROTOCOL_PORT.IsRxReady() == true)
+                {
+                    UARTProtocolRxBufferProcessing();    
                 }
                 break;
         }
@@ -197,12 +196,8 @@ void ResetPatternDetectedCallback(void)
     isResetPatternDetected = true;
 }
 
-void INT1_UserInterruptHandler(void)
+void INT_pin1_UserInterruptHandler(void)
 {
     isInterrupt1Received = true;
 }
 
-void INT2_UserInterruptHandler(void)
-{
-    isInterrupt2Received = true;
-}

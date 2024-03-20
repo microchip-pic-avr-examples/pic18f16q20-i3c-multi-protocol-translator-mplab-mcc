@@ -11,7 +11,7 @@
  */ 
 
 /*
-© [2023] Microchip Technology Inc. and its subsidiaries.
+© [2024] Microchip Technology Inc. and its subsidiaries.
 
     Subject to your compliance with these terms, you may use Microchip 
     software and any derivatives exclusively with Microchip products. 
@@ -227,7 +227,7 @@ void DMA2_DMAPrioritySet(uint8_t priority)
     INTCON0bits.GIE = GIESaveState;
 }
 
-void __interrupt(irq(IRQ_DMA2DCNT),base(8)) DMA2_DMADCNTI_ISR()
+void DMA2_DMADCNTI_ISR(void)
 {
     // Clear the source count interrupt flag
     PIR1bits.DMA2DCNTIF = 0;

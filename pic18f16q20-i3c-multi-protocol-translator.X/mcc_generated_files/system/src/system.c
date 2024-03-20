@@ -7,11 +7,13 @@
  * 
  * @brief This file contains the API implementation for the System driver.
  *
- * @version Driver Version 1.0.1
+ * @version Driver Version 1.0.2
+ *
+ * @version Package Version 1.0.2
 */
 
 /*
-© [2023] Microchip Technology Inc. and its subsidiaries.
+© [2024] Microchip Technology Inc. and its subsidiaries.
 
     Subject to your compliance with these terms, you may use Microchip 
     software and any derivatives exclusively with Microchip products. 
@@ -31,14 +33,7 @@
     THIS SOFTWARE.
 */
 
- /**
-   Section: Included Files
- */
 #include "../system.h"
-
-/**
-  Section: Driver APIs
-*/
 
 /** 
 * @ingroup systemdriver
@@ -47,6 +42,14 @@
 * @return None.
 */
 void CPU_Initialize(void);
+
+
+/**
+ * @ingroup systemdriver
+ * @brief Performs lock operation. It is mandatory for DMA operation.
+ * @param None.
+ * @return None.
+*/
 void SystemArbiter_Initialize();
 
 void SYSTEM_Initialize(void)
@@ -59,8 +62,9 @@ void SYSTEM_Initialize(void)
     I2C1_Host_Initialize();
     I3C2_Initialize();
     MVIO_Initialize();
-    SPI1_Initialize();
+    SPI1_Host_Initialize();
     UART1_Initialize();
+    UART2_Initialize();
     INTERRUPT_Initialize();
     SystemArbiter_Initialize();
 }
@@ -88,7 +92,6 @@ void CPU_Initialize(void)
     //PRODL undefined; 
     PRODL = 0x0;
 }
-
 
 void SystemArbiter_Initialize(void)
 {

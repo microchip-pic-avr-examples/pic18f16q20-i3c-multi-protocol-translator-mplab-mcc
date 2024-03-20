@@ -3,17 +3,15 @@
  * 
  * @file i3c_target_types.h
  * 
- * @ingroup i3c_target_driver
+ * @defgroup i3c_target_driver
  * 
  * @brief This is the generated driver types header file for the I3C Target driver.
  *
- * @version I3C Target Source Code Driver Version 1.0.0
- *
- * @version I3C Melody Peripheral Library (PLIB) Version 1.0.0
+ * @version I3C Target Source Code Driver Version 1.0.1
 */
 
 /*
-© [2023] Microchip Technology Inc. and its subsidiaries.
+© [2024] Microchip Technology Inc. and its subsidiaries.
 
     Subject to your compliance with these terms, you may use Microchip 
     software and any derivatives exclusively with Microchip products. 
@@ -104,7 +102,7 @@ enum I3C_CCC
    I3C_CCC_SETNEWDA_D   = 0x88,   /**< Set New Dynamic Address */
    I3C_CCC_SETMWL_D     = 0x89,   /**< Set Max Write Length */
    I3C_CCC_SETMRL_D     = 0x8A,   /**< Set Max Read Length */
-   I3C_CCC_ENTTM_D      = 0x8B,   /**< Enter Test Mode */
+   I3C_CCC_GETMWL_D     = 0x8B,   /**< Get Max Write Length */
    I3C_CCC_GETMRL_D     = 0x8C,   /**< Get Max Read Length */
    I3C_CCC_GETPID_D     = 0x8D,   /**< Get Provisioned ID */
    I3C_CCC_GETBCR_D     = 0x8E,   /**< Get Bus Characteristics Register  */

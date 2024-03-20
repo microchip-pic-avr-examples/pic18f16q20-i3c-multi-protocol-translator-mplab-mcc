@@ -7,13 +7,11 @@
  *
  * @brief This file contains API prototypes and other data types for the I3C2 Target DMA driver.
  *
- * @version I3C Target DMA Source Code Driver Version 1.0.0
- *
- * @version I3C Melody Peripheral Library (PLIB) Version 1.0.0
+ * @version I3C Target DMA Source Code Driver Version 1.0.1
 */
 
 /*
-© [2023] Microchip Technology Inc. and its subsidiaries.
+© [2024] Microchip Technology Inc. and its subsidiaries.
 
     Subject to your compliance with these terms, you may use Microchip 
     software and any derivatives exclusively with Microchip products. 
@@ -128,7 +126,7 @@ void I3C2_MaxReadLengthSet(uint16_t maxReadLen);
  * @param [in] rxBuf - Pointer to the buffer in which data needs to be received.
  * @note Lifetime of the buffer must be maintained till data is received.
  * @param [in] len - Size of the buffer. 
- * @note Buffer size must be greater than or equal to expected size of data received in the next Private Write transaction.
+ * @note Buffer size must be greater than the expected size of data received in the next Private Write transaction.
  * @return Status of the I3C2 buffer receive operation as described in I3C_TARGET_BUFFER_RECEIVE_ERROR. 
  */
 enum I3C_TARGET_BUFFER_RECEIVE_ERROR I3C2_BufferReceive(uint8_t *rxBuf, uint16_t len);
@@ -361,6 +359,22 @@ void I3C2_ResetPatternDetectedCallbackRegister(void (*handler)(void));
  * @return None. 
  */
 void I3C2_RxSoftwareBufferFullCallbackRegister(void (*handler)(void));
+
+/**
+ * @ingroup i3c_target_driver
+ * @brief I3C2 General Interrupt Service Routine (ISR) function. 
+ * @param None.  
+ * @return None.  
+ */
+void I3C2_General_ISR(void);
+
+/**
+ * @ingroup i3c_target_driver
+ * @brief I3C2 Reset Interrupt Service Routine (ISR) function.  
+ * @param None. 
+ * @return None. 
+ */
+void I3C2_Reset_ISR(void);
  
 /**
  * @ingroup i3c_target_driver

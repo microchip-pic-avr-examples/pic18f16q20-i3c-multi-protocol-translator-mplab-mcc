@@ -11,7 +11,7 @@
  */
 
 /*
-© [2023] Microchip Technology Inc. and its subsidiaries.
+© [2024] Microchip Technology Inc. and its subsidiaries.
 
     Subject to your compliance with these terms, you may use Microchip 
     software and any derivatives exclusively with Microchip products. 
@@ -234,6 +234,38 @@ bool I2C1_IsBusy(void);
  * @endcode
  */
 void I2C1_CallbackRegister(void (*callbackHandler)(void));
+
+/**
+ * @ingroup I2C1_host
+ * @brief This function is ISR function for I2C1 Common interrupts
+ * @param void
+ * @return void
+ */
+void I2C1_ISR(void);
+
+/**
+ * @ingroup I2C1_host
+ * @brief This function is ISR function for I2C1 Error interrupts
+ * @param void
+ * @return void
+ */
+void I2C1_ERROR_ISR(void);
+
+/**
+ * @ingroup I2C1_host
+ * @brief This function is ISR function for I2C1 Receive interrupts
+ * @param void
+ * @return void
+ */
+void I2C1_RX_ISR(void);
+
+/**
+ * @ingroup I2C1_host
+ * @brief This function is ISR function for I2C1 Transmit interrupts
+ * @param void
+ * @return void
+ */
+void I2C1_TX_ISR(void);
 
 
 #endif //I2C1_H

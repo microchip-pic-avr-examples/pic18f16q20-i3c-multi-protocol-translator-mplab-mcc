@@ -10,7 +10,7 @@
  * @version UART1 Driver Version 3.0.4
 */
 /*
-© [2023] Microchip Technology Inc. and its subsidiaries.
+© [2024] Microchip Technology Inc. and its subsidiaries.
 
     Subject to your compliance with these terms, you may use Microchip 
     software and any derivatives exclusively with Microchip products. 
@@ -49,35 +49,35 @@
 
 #endif
 
-#define UART1_interface UART1
+#define UART_PROTOCOL_PORT_interface UART_PROTOCOL_PORT
 
 
-#define UART1_Initialize     UART1_Initialize
-#define UART1_Deinitialize   UART1_Deinitialize
-#define UART1_Write          UART1_Write
-#define UART1_Read           UART1_Read
-#define UART1__IsRxReady     UART1_IsRxReady
-#define UART1_IsTxReady      UART1_IsTxReady
-#define UART1_IsTxDone       UART1_IsTxDone
+#define UART_PROTOCOL_PORT_Initialize     UART1_Initialize
+#define UART_PROTOCOL_PORT_Deinitialize   UART1_Deinitialize
+#define UART_PROTOCOL_PORT_Write          UART1_Write
+#define UART_PROTOCOL_PORT_Read           UART1_Read
+#define UART_PROTOCOL_PORT__IsRxReady     UART1_IsRxReady
+#define UART_PROTOCOL_PORT_IsTxReady      UART1_IsTxReady
+#define UART_PROTOCOL_PORT_IsTxDone       UART1_IsTxDone
 
-#define UART1_TransmitEnable       UART1_TransmitEnable
-#define UART1_TransmitDisable      UART1_TransmitDisable
-#define UART1_AutoBaudSet          UART1_AutoBaudSet
-#define UART1_AutoBaudQuery        UART1_AutoBaudQuery
-#define UART1_BRGCountSet               (NULL)
-#define UART1_BRGCountGet               (NULL)
-#define UART1_BaudRateSet               (NULL)
-#define UART1_BaudRateGet               (NULL)
-#define UART1__AutoBaudEventEnableGet   (NULL)
-#define UART1_ErrorGet             UART1_ErrorGet
+#define UART_PROTOCOL_PORT_TransmitEnable       UART1_TransmitEnable
+#define UART_PROTOCOL_PORT_TransmitDisable      UART1_TransmitDisable
+#define UART_PROTOCOL_PORT_AutoBaudSet          UART1_AutoBaudSet
+#define UART_PROTOCOL_PORT_AutoBaudQuery        UART1_AutoBaudQuery
+#define UART_PROTOCOL_PORT_BRGCountSet               (NULL)
+#define UART_PROTOCOL_PORT_BRGCountGet               (NULL)
+#define UART_PROTOCOL_PORT_BaudRateSet               (NULL)
+#define UART_PROTOCOL_PORT_BaudRateGet               (NULL)
+#define UART_PROTOCOL_PORT__AutoBaudEventEnableGet   (NULL)
+#define UART_PROTOCOL_PORT_ErrorGet             UART1_ErrorGet
 
-#define UART1_TxCompleteCallbackRegister     (NULL)
-#define UART1_RxCompleteCallbackRegister      (NULL)
-#define UART1_TxCollisionCallbackRegister  (NULL)
-#define UART1_FramingErrorCallbackRegister UART1_FramingErrorCallbackRegister
-#define UART1_OverrunErrorCallbackRegister UART1_OverrunErrorCallbackRegister
-#define UART1_ParityErrorCallbackRegister  UART1_ParityErrorCallbackRegister
-#define UART1_EventCallbackRegister        (NULL)
+#define UART_PROTOCOL_PORT_TxCompleteCallbackRegister     UART1_TxCompleteCallbackRegister
+#define UART_PROTOCOL_PORT_RxCompleteCallbackRegister      UART1_RxCompleteCallbackRegister
+#define UART_PROTOCOL_PORT_TxCollisionCallbackRegister  (NULL)
+#define UART_PROTOCOL_PORT_FramingErrorCallbackRegister UART1_FramingErrorCallbackRegister
+#define UART_PROTOCOL_PORT_OverrunErrorCallbackRegister UART1_OverrunErrorCallbackRegister
+#define UART_PROTOCOL_PORT_ParityErrorCallbackRegister  UART1_ParityErrorCallbackRegister
+#define UART_PROTOCOL_PORT_EventCallbackRegister        (NULL)
 
 /**
  @ingroup uart1
@@ -102,7 +102,7 @@ typedef union {
  * @ingroup uart1
  * @brief External object for uart_drv_interface.
  */
-extern const uart_drv_interface_t UART1;
+extern const uart_drv_interface_t UART_PROTOCOL_PORT;
 
 /**
  * @ingroup uart1
@@ -189,6 +189,38 @@ inline void UART1_SendBreakControlEnable(void);
  * @return None.
  */
 inline void UART1_SendBreakControlDisable(void);
+
+/**
+ * @ingroup uart1
+ * @brief This API enables the UART1 transmitter interrupt.
+ * @param None.
+ * @return None.
+ */
+inline void UART1_TransmitInterruptEnable(void);
+
+/**
+ * @ingroup uart1
+ * @brief This API disables the UART1 transmitter interrupt.
+ * @param None.
+ * @return None.
+ */
+inline void UART1_TransmitInterruptDisable(void);
+
+/**
+ * @ingroup uart1
+ * @brief This API enables the UART1 receiver interrupt.
+ * @param None.
+ * @return None.
+ */
+inline void UART1_ReceiveInterruptEnable(void);
+
+/**
+ * @ingroup uart1
+ * @brief This API disables the UART1 receiver interrupt.
+ * @param None.
+ * @return None.
+ */
+inline void UART1_ReceiveInterruptDisable(void);
 
 /**
  * @ingroup uart1
@@ -311,6 +343,55 @@ void UART1_OverrunErrorCallbackRegister(void (* callbackHandler)(void));
  * @return None.
  */
 void UART1_ParityErrorCallbackRegister(void (* callbackHandler)(void));
+
+/**
+ * @ingroup uart1
+ * @brief This is a pointer to the function that will be called upon transmit interrupt.
+ * @pre Initialize the UART1 module with transmit interrupt enabled
+ * @param None.
+ * @return None.
+ */
+void (*UART1_TxInterruptHandler)(void);
+
+/**
+ * @ingroup uart1
+ * @brief This API registers the function to be called upon Transmitter interrupt.
+ * @param callbackHandler - a function pointer which will be called upon Transmitter interrupt condition.
+ * @return None.
+ */
+void UART1_TxCompleteCallbackRegister(void (* callbackHandler)(void));
+
+/**
+ * @ingroup uart1
+ * @brief This function is a ISR function to be called upon Transmitter interrupt.
+ * @param void.
+ * @return None.
+ */
+void UART1_TransmitISR(void);
+
+/**
+ * @ingroup uart1
+ * @brief This is a pointer to the function that will be called upon receive interrupt.
+ * @pre Initialize the UART1 module with receive interrupt enabled
+ * @param None.
+ * @return None.
+ */
+void (*UART1_RxInterruptHandler)(void);
+/**
+ * @ingroup uart1
+ * @brief This API registers the function to be called upon Receiver interrupt.
+ * @param callbackHandler - a function pointer which will be called upon Receiver interrupt condition.
+ * @return None.
+ */
+void UART1_RxCompleteCallbackRegister(void (* callbackHandler)(void));
+
+/**
+ * @ingroup uart1
+ * @brief This function is ISR function to be called upon Receiver interrupt.
+ * @param void.
+ * @return None.
+ */
+void UART1_ReceiveISR(void);
 
 #ifdef __cplusplus  // Provide C++ Compatibility
 

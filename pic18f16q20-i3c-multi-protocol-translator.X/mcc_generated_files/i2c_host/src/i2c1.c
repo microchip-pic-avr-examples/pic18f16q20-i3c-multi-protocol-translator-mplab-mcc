@@ -11,7 +11,7 @@
  */
 
 /*
-© [2023] Microchip Technology Inc. and its subsidiaries.
+© [2024] Microchip Technology Inc. and its subsidiaries.
 
     Subject to your compliance with these terms, you may use Microchip 
     software and any derivatives exclusively with Microchip products. 
@@ -227,7 +227,7 @@ void I2C1_CallbackRegister(void (*callbackHandler)(void))
     }
 }
 
-void __interrupt(irq(I2C1), base(8)) I2C1_ISR(void)
+void I2C1_ISR()
 {
     if (I2C1PIEbits.PCIE && I2C1PIRbits.PCIF)
     {
@@ -256,7 +256,7 @@ void __interrupt(irq(I2C1), base(8)) I2C1_ISR(void)
     }
 }
 
-void __interrupt(irq(I2C1E), base(8)) I2C1_ERROR_ISR(void)
+void I2C1_ERROR_ISR()
 {
     if (I2C1_IsBusCol())
     {
@@ -292,12 +292,12 @@ void __interrupt(irq(I2C1E), base(8)) I2C1_ERROR_ISR(void)
     }
 }
 
-void __interrupt(irq(I2C1RX), base(8)) I2C1_RX_ISR(void)
+void I2C1_RX_ISR()
 {
     *i2c1Status.readPtr++ = I2C1_DataReceive();
 }
 
-void __interrupt(irq(I2C1TX), base(8)) I2C1_TX_ISR(void)
+void I2C1_TX_ISR()
 {
     I2C1_DataTransmit(*i2c1Status.writePtr++);
 }

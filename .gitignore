@@ -4,3 +4,5 @@
 !/**/nbproject/*.xml
 /**/dist/*
 /**/.generated_files/*
+/**/mcc-manifest-autosave.yml
+/**/mcc-manifest-generated-success.yml

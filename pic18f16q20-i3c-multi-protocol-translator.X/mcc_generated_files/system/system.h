@@ -5,12 +5,15 @@
  * 
  * @defgroup systemdriver System Driver
  * 
- * @brief This is the generated header file for the System driver.
+ * @brief This file contains the API prototype for the System Driver.
  *
- * @version Driver Version 1.0.1
+ * @version Driver Version 1.0.2
+ *
+ * @version Package Version 1.0.2
 */
+
 /*
-© [2023] Microchip Technology Inc. and its subsidiaries.
+© [2024] Microchip Technology Inc. and its subsidiaries.
 
     Subject to your compliance with these terms, you may use Microchip 
     software and any derivatives exclusively with Microchip products. 
@@ -33,9 +36,6 @@
 #ifndef SYSTEM_H
 #define	SYSTEM_H
 
-/**
-  Section: Included Files
-*/
 #include <xc.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -49,6 +49,7 @@
 #include "../system/mvio.h"
 #include "../spi/spi1.h"
 #include "../uart/uart1.h"
+#include "../uart/uart2.h"
 #include "../system/interrupt.h"
 
 /**

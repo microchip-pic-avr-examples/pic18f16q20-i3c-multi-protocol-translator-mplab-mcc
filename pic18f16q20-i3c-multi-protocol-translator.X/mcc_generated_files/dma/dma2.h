@@ -11,7 +11,7 @@
  */
 
 /*
-© [2023] Microchip Technology Inc. and its subsidiaries.
+© [2024] Microchip Technology Inc. and its subsidiaries.
 
     Subject to your compliance with these terms, you may use Microchip 
     software and any derivatives exclusively with Microchip products. 
@@ -68,6 +68,7 @@
 #define DMA_I3C2_RX_TransferStop                  DMA2_TransferStop
 #define DMA_I3C2_RX_DMAPrioritySet                DMA2_DMAPrioritySet
 #define DMA_I3C2_RX_DCNTIInterruptHandlerSet      DMA2_DCNTIInterruptHandlerSet
+#define DMA_I3C2_RX_DMADCNTI_ISR                  DMA2_DMADCNTI_ISR 
 ///@}
 
 /**
@@ -276,5 +277,13 @@ void DMA2_DMAPrioritySet(uint8_t priority);
  * @return None.
  */
 void DMA2_DCNTIInterruptHandlerSet(void (* InterruptHandler)(void));
+
+/**
+ * @ingroup dma2
+ * @brief Implements the ISR for the DMA2 destination count interrupt events.
+ * @param None.
+ * @return None.
+ */
+void DMA2_DMADCNTI_ISR(void);
 
 #endif //DMA2_H

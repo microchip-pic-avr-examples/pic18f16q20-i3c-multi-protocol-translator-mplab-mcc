@@ -7,13 +7,11 @@
  *            
  * @brief This file contains the API implementation for the I3C2 Target DMA driver.
  *            
- * @version I3C Target DMA Source Code Driver Version 1.0.0
- *
- * @version I3C Melody Peripheral Library (PLIB) Version 1.0.0
+ * @version I3C Target DMA Source Code Driver Version 1.0.1
 */
 
 /*
-© [2023] Microchip Technology Inc. and its subsidiaries.
+© [2024] Microchip Technology Inc. and its subsidiaries.
 
     Subject to your compliance with these terms, you may use Microchip 
     software and any derivatives exclusively with Microchip products. 
@@ -140,8 +138,8 @@ void I3C2_Initialize(void)
     I3C2MRTH = 0x0;
 	// MRTU 0x0; 
     I3C2MRTU = 0x0;
-	// RSTACT 0x0; 
-    I3C2RSTACT = 0x0;
+	// RSTACT 0xff; 
+    I3C2RSTACT = 0xFF;
 	// FLTEN disabled; SDAHT No hold time; 
     I3C2I2CCON = 0x0;
 	// CLK Fosc; 
@@ -495,7 +493,7 @@ void I3C2_RxSoftwareBufferFullCallbackRegister(void (*handler)(void))
     }  
 }
 
-void __interrupt(irq(IRQ_I3C2),base(8)) I3C2_General_ISR(void)
+void I3C2_General_ISR(void)
 {
 	if(I3C2PIR1bits.TCOMPIF == 1)
 	{
@@ -522,7 +520,7 @@ void __interrupt(irq(IRQ_I3C2),base(8)) I3C2_General_ISR(void)
 	}
 }
 
-void __interrupt(irq(IRQ_I3C2R),base(8)) I3C2_Reset_ISR(void)
+void I3C2_Reset_ISR(void)
 {		
 	// Clear RSTDET bit to clear the RIF flag
 	I3C2STAT0bits.RSTDET = 0;

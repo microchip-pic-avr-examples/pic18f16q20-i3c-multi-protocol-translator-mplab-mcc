@@ -12,7 +12,7 @@
 */
 
 /*
-© [2023] Microchip Technology Inc. and its subsidiaries.
+© [2024] Microchip Technology Inc. and its subsidiaries.
 
     Subject to your compliance with these terms, you may use Microchip 
     software and any derivatives exclusively with Microchip products. 
@@ -50,65 +50,65 @@
 #define PULL_UP_DISABLED     0
 
 // get/set RA0 aliases
-#define RST1_TRIS                 TRISAbits.TRISA0
-#define RST1_LAT                  LATAbits.LATA0
-#define RST1_PORT                 PORTAbits.RA0
-#define RST1_WPU                  WPUAbits.WPUA0
-#define RST1_OD                   ODCONAbits.ODCA0
-#define RST1_ANS                  ANSELAbits.ANSELA0
-#define RST1_SetHigh()            do { LATAbits.LATA0 = 1; } while(0)
-#define RST1_SetLow()             do { LATAbits.LATA0 = 0; } while(0)
-#define RST1_Toggle()             do { LATAbits.LATA0 = ~LATAbits.LATA0; } while(0)
-#define RST1_GetValue()           PORTAbits.RA0
-#define RST1_SetDigitalInput()    do { TRISAbits.TRISA0 = 1; } while(0)
-#define RST1_SetDigitalOutput()   do { TRISAbits.TRISA0 = 0; } while(0)
-#define RST1_SetPullup()          do { WPUAbits.WPUA0 = 1; } while(0)
-#define RST1_ResetPullup()        do { WPUAbits.WPUA0 = 0; } while(0)
-#define RST1_SetPushPull()        do { ODCONAbits.ODCA0 = 0; } while(0)
-#define RST1_SetOpenDrain()       do { ODCONAbits.ODCA0 = 1; } while(0)
-#define RST1_SetAnalogMode()      do { ANSELAbits.ANSELA0 = 1; } while(0)
-#define RST1_SetDigitalMode()     do { ANSELAbits.ANSELA0 = 0; } while(0)
+#define RST_pin1_TRIS                 TRISAbits.TRISA0
+#define RST_pin1_LAT                  LATAbits.LATA0
+#define RST_pin1_PORT                 PORTAbits.RA0
+#define RST_pin1_WPU                  WPUAbits.WPUA0
+#define RST_pin1_OD                   ODCONAbits.ODCA0
+#define RST_pin1_ANS                  ANSELAbits.ANSELA0
+#define RST_pin1_SetHigh()            do { LATAbits.LATA0 = 1; } while(0)
+#define RST_pin1_SetLow()             do { LATAbits.LATA0 = 0; } while(0)
+#define RST_pin1_Toggle()             do { LATAbits.LATA0 = ~LATAbits.LATA0; } while(0)
+#define RST_pin1_GetValue()           PORTAbits.RA0
+#define RST_pin1_SetDigitalInput()    do { TRISAbits.TRISA0 = 1; } while(0)
+#define RST_pin1_SetDigitalOutput()   do { TRISAbits.TRISA0 = 0; } while(0)
+#define RST_pin1_SetPullup()          do { WPUAbits.WPUA0 = 1; } while(0)
+#define RST_pin1_ResetPullup()        do { WPUAbits.WPUA0 = 0; } while(0)
+#define RST_pin1_SetPushPull()        do { ODCONAbits.ODCA0 = 0; } while(0)
+#define RST_pin1_SetOpenDrain()       do { ODCONAbits.ODCA0 = 1; } while(0)
+#define RST_pin1_SetAnalogMode()      do { ANSELAbits.ANSELA0 = 1; } while(0)
+#define RST_pin1_SetDigitalMode()     do { ANSELAbits.ANSELA0 = 0; } while(0)
 
 // get/set RA1 aliases
-#define INT1_Client_TRIS                 TRISAbits.TRISA1
-#define INT1_Client_LAT                  LATAbits.LATA1
-#define INT1_Client_PORT                 PORTAbits.RA1
-#define INT1_Client_WPU                  WPUAbits.WPUA1
-#define INT1_Client_OD                   ODCONAbits.ODCA1
-#define INT1_Client_ANS                  ANSELAbits.ANSELA1
-#define INT1_Client_SetHigh()            do { LATAbits.LATA1 = 1; } while(0)
-#define INT1_Client_SetLow()             do { LATAbits.LATA1 = 0; } while(0)
-#define INT1_Client_Toggle()             do { LATAbits.LATA1 = ~LATAbits.LATA1; } while(0)
-#define INT1_Client_GetValue()           PORTAbits.RA1
-#define INT1_Client_SetDigitalInput()    do { TRISAbits.TRISA1 = 1; } while(0)
-#define INT1_Client_SetDigitalOutput()   do { TRISAbits.TRISA1 = 0; } while(0)
-#define INT1_Client_SetPullup()          do { WPUAbits.WPUA1 = 1; } while(0)
-#define INT1_Client_ResetPullup()        do { WPUAbits.WPUA1 = 0; } while(0)
-#define INT1_Client_SetPushPull()        do { ODCONAbits.ODCA1 = 0; } while(0)
-#define INT1_Client_SetOpenDrain()       do { ODCONAbits.ODCA1 = 1; } while(0)
-#define INT1_Client_SetAnalogMode()      do { ANSELAbits.ANSELA1 = 1; } while(0)
-#define INT1_Client_SetDigitalMode()     do { ANSELAbits.ANSELA1 = 0; } while(0)
-#define RA1_SetInterruptHandler  INT1_Client_SetInterruptHandler
+#define IO_RA1_TRIS                 TRISAbits.TRISA1
+#define IO_RA1_LAT                  LATAbits.LATA1
+#define IO_RA1_PORT                 PORTAbits.RA1
+#define IO_RA1_WPU                  WPUAbits.WPUA1
+#define IO_RA1_OD                   ODCONAbits.ODCA1
+#define IO_RA1_ANS                  ANSELAbits.ANSELA1
+#define IO_RA1_SetHigh()            do { LATAbits.LATA1 = 1; } while(0)
+#define IO_RA1_SetLow()             do { LATAbits.LATA1 = 0; } while(0)
+#define IO_RA1_Toggle()             do { LATAbits.LATA1 = ~LATAbits.LATA1; } while(0)
+#define IO_RA1_GetValue()           PORTAbits.RA1
+#define IO_RA1_SetDigitalInput()    do { TRISAbits.TRISA1 = 1; } while(0)
+#define IO_RA1_SetDigitalOutput()   do { TRISAbits.TRISA1 = 0; } while(0)
+#define IO_RA1_SetPullup()          do { WPUAbits.WPUA1 = 1; } while(0)
+#define IO_RA1_ResetPullup()        do { WPUAbits.WPUA1 = 0; } while(0)
+#define IO_RA1_SetPushPull()        do { ODCONAbits.ODCA1 = 0; } while(0)
+#define IO_RA1_SetOpenDrain()       do { ODCONAbits.ODCA1 = 1; } while(0)
+#define IO_RA1_SetAnalogMode()      do { ANSELAbits.ANSELA1 = 1; } while(0)
+#define IO_RA1_SetDigitalMode()     do { ANSELAbits.ANSELA1 = 0; } while(0)
 
 // get/set RA2 aliases
-#define RST2_TRIS                 TRISAbits.TRISA2
-#define RST2_LAT                  LATAbits.LATA2
-#define RST2_PORT                 PORTAbits.RA2
-#define RST2_WPU                  WPUAbits.WPUA2
-#define RST2_OD                   ODCONAbits.ODCA2
-#define RST2_ANS                  ANSELAbits.ANSELA2
-#define RST2_SetHigh()            do { LATAbits.LATA2 = 1; } while(0)
-#define RST2_SetLow()             do { LATAbits.LATA2 = 0; } while(0)
-#define RST2_Toggle()             do { LATAbits.LATA2 = ~LATAbits.LATA2; } while(0)
-#define RST2_GetValue()           PORTAbits.RA2
-#define RST2_SetDigitalInput()    do { TRISAbits.TRISA2 = 1; } while(0)
-#define RST2_SetDigitalOutput()   do { TRISAbits.TRISA2 = 0; } while(0)
-#define RST2_SetPullup()          do { WPUAbits.WPUA2 = 1; } while(0)
-#define RST2_ResetPullup()        do { WPUAbits.WPUA2 = 0; } while(0)
-#define RST2_SetPushPull()        do { ODCONAbits.ODCA2 = 0; } while(0)
-#define RST2_SetOpenDrain()       do { ODCONAbits.ODCA2 = 1; } while(0)
-#define RST2_SetAnalogMode()      do { ANSELAbits.ANSELA2 = 1; } while(0)
-#define RST2_SetDigitalMode()     do { ANSELAbits.ANSELA2 = 0; } while(0)
+#define INT_pin1_TRIS                 TRISAbits.TRISA2
+#define INT_pin1_LAT                  LATAbits.LATA2
+#define INT_pin1_PORT                 PORTAbits.RA2
+#define INT_pin1_WPU                  WPUAbits.WPUA2
+#define INT_pin1_OD                   ODCONAbits.ODCA2
+#define INT_pin1_ANS                  ANSELAbits.ANSELA2
+#define INT_pin1_SetHigh()            do { LATAbits.LATA2 = 1; } while(0)
+#define INT_pin1_SetLow()             do { LATAbits.LATA2 = 0; } while(0)
+#define INT_pin1_Toggle()             do { LATAbits.LATA2 = ~LATAbits.LATA2; } while(0)
+#define INT_pin1_GetValue()           PORTAbits.RA2
+#define INT_pin1_SetDigitalInput()    do { TRISAbits.TRISA2 = 1; } while(0)
+#define INT_pin1_SetDigitalOutput()   do { TRISAbits.TRISA2 = 0; } while(0)
+#define INT_pin1_SetPullup()          do { WPUAbits.WPUA2 = 1; } while(0)
+#define INT_pin1_ResetPullup()        do { WPUAbits.WPUA2 = 0; } while(0)
+#define INT_pin1_SetPushPull()        do { ODCONAbits.ODCA2 = 0; } while(0)
+#define INT_pin1_SetOpenDrain()       do { ODCONAbits.ODCA2 = 1; } while(0)
+#define INT_pin1_SetAnalogMode()      do { ANSELAbits.ANSELA2 = 1; } while(0)
+#define INT_pin1_SetDigitalMode()     do { ANSELAbits.ANSELA2 = 0; } while(0)
+#define RA2_SetInterruptHandler  INT_pin1_SetInterruptHandler
 
 // get/set RA4 aliases
 #define CS1_TRIS                 TRISAbits.TRISA4
@@ -291,25 +291,24 @@
 #define IO_RC4_SetDigitalMode()     do { ANSELCbits.ANSELC4 = 0; } while(0)
 
 // get/set RC5 aliases
-#define INT2_Client_TRIS                 TRISCbits.TRISC5
-#define INT2_Client_LAT                  LATCbits.LATC5
-#define INT2_Client_PORT                 PORTCbits.RC5
-#define INT2_Client_WPU                  WPUCbits.WPUC5
-#define INT2_Client_OD                   ODCONCbits.ODCC5
-#define INT2_Client_ANS                  ANSELCbits.ANSELC5
-#define INT2_Client_SetHigh()            do { LATCbits.LATC5 = 1; } while(0)
-#define INT2_Client_SetLow()             do { LATCbits.LATC5 = 0; } while(0)
-#define INT2_Client_Toggle()             do { LATCbits.LATC5 = ~LATCbits.LATC5; } while(0)
-#define INT2_Client_GetValue()           PORTCbits.RC5
-#define INT2_Client_SetDigitalInput()    do { TRISCbits.TRISC5 = 1; } while(0)
-#define INT2_Client_SetDigitalOutput()   do { TRISCbits.TRISC5 = 0; } while(0)
-#define INT2_Client_SetPullup()          do { WPUCbits.WPUC5 = 1; } while(0)
-#define INT2_Client_ResetPullup()        do { WPUCbits.WPUC5 = 0; } while(0)
-#define INT2_Client_SetPushPull()        do { ODCONCbits.ODCC5 = 0; } while(0)
-#define INT2_Client_SetOpenDrain()       do { ODCONCbits.ODCC5 = 1; } while(0)
-#define INT2_Client_SetAnalogMode()      do { ANSELCbits.ANSELC5 = 1; } while(0)
-#define INT2_Client_SetDigitalMode()     do { ANSELCbits.ANSELC5 = 0; } while(0)
-#define RC5_SetInterruptHandler  INT2_Client_SetInterruptHandler
+#define IO_RC5_TRIS                 TRISCbits.TRISC5
+#define IO_RC5_LAT                  LATCbits.LATC5
+#define IO_RC5_PORT                 PORTCbits.RC5
+#define IO_RC5_WPU                  WPUCbits.WPUC5
+#define IO_RC5_OD                   ODCONCbits.ODCC5
+#define IO_RC5_ANS                  ANSELCbits.ANSELC5
+#define IO_RC5_SetHigh()            do { LATCbits.LATC5 = 1; } while(0)
+#define IO_RC5_SetLow()             do { LATCbits.LATC5 = 0; } while(0)
+#define IO_RC5_Toggle()             do { LATCbits.LATC5 = ~LATCbits.LATC5; } while(0)
+#define IO_RC5_GetValue()           PORTCbits.RC5
+#define IO_RC5_SetDigitalInput()    do { TRISCbits.TRISC5 = 1; } while(0)
+#define IO_RC5_SetDigitalOutput()   do { TRISCbits.TRISC5 = 0; } while(0)
+#define IO_RC5_SetPullup()          do { WPUCbits.WPUC5 = 1; } while(0)
+#define IO_RC5_ResetPullup()        do { WPUCbits.WPUC5 = 0; } while(0)
+#define IO_RC5_SetPushPull()        do { ODCONCbits.ODCC5 = 0; } while(0)
+#define IO_RC5_SetOpenDrain()       do { ODCONCbits.ODCC5 = 1; } while(0)
+#define IO_RC5_SetAnalogMode()      do { ANSELCbits.ANSELC5 = 1; } while(0)
+#define IO_RC5_SetDigitalMode()     do { ANSELCbits.ANSELC5 = 0; } while(0)
 
 // get/set RC6 aliases
 #define SDI_TRIS                 TRISCbits.TRISC6
@@ -369,83 +368,43 @@ void PIN_MANAGER_IOC(void);
 
 /**
  * @ingroup  pinsdriver
- * @brief Interrupt on Change Handler for the INT1_Client pin functionality
+ * @brief Interrupt on Change Handler for the INT_pin1 pin functionality
  * @param none
  * @return none
  */
-void INT1_Client_ISR(void);
+void INT_pin1_ISR(void);
 
 /**
  * @ingroup  pinsdriver
- * @brief Interrupt Handler Setter for INT1_Client pin interrupt-on-change functionality.
- *        Allows selecting an interrupt handler for INT1_Client at application runtime
+ * @brief Interrupt Handler Setter for INT_pin1 pin interrupt-on-change functionality.
+ *        Allows selecting an interrupt handler for INT_pin1 at application runtime
  * @pre Pins intializer called
  * @param InterruptHandler function pointer.
  * @return none
  */
-void INT1_Client_SetInterruptHandler(void (* InterruptHandler)(void));
+void INT_pin1_SetInterruptHandler(void (* InterruptHandler)(void));
 
 /**
  * @ingroup  pinsdriver
- * @brief Dynamic Interrupt Handler for INT1_Client pin.
- *        This is a dynamic interrupt handler to be used together with the INT1_Client_SetInterruptHandler() method.
- *        This handler is called every time the INT1_Client ISR is executed and allows any function to be registered at runtime.
+ * @brief Dynamic Interrupt Handler for INT_pin1 pin.
+ *        This is a dynamic interrupt handler to be used together with the INT_pin1_SetInterruptHandler() method.
+ *        This handler is called every time the INT_pin1 ISR is executed and allows any function to be registered at runtime.
  * @pre Pins intializer called
  * @param none
  * @return none
  */
-extern void (*INT1_Client_InterruptHandler)(void);
+extern void (*INT_pin1_InterruptHandler)(void);
 
 /**
  * @ingroup  pinsdriver
- * @brief Default Interrupt Handler for INT1_Client pin. 
- *        This is a predefined interrupt handler to be used together with the INT1_Client_SetInterruptHandler() method.
- *        This handler is called every time the INT1_Client ISR is executed. 
+ * @brief Default Interrupt Handler for INT_pin1 pin. 
+ *        This is a predefined interrupt handler to be used together with the INT_pin1_SetInterruptHandler() method.
+ *        This handler is called every time the INT_pin1 ISR is executed. 
  * @pre Pins intializer called
  * @param none
  * @return none
  */
-void INT1_Client_DefaultInterruptHandler(void);
-
-/**
- * @ingroup  pinsdriver
- * @brief Interrupt on Change Handler for the INT2_Client pin functionality
- * @param none
- * @return none
- */
-void INT2_Client_ISR(void);
-
-/**
- * @ingroup  pinsdriver
- * @brief Interrupt Handler Setter for INT2_Client pin interrupt-on-change functionality.
- *        Allows selecting an interrupt handler for INT2_Client at application runtime
- * @pre Pins intializer called
- * @param InterruptHandler function pointer.
- * @return none
- */
-void INT2_Client_SetInterruptHandler(void (* InterruptHandler)(void));
-
-/**
- * @ingroup  pinsdriver
- * @brief Dynamic Interrupt Handler for INT2_Client pin.
- *        This is a dynamic interrupt handler to be used together with the INT2_Client_SetInterruptHandler() method.
- *        This handler is called every time the INT2_Client ISR is executed and allows any function to be registered at runtime.
- * @pre Pins intializer called
- * @param none
- * @return none
- */
-extern void (*INT2_Client_InterruptHandler)(void);
-
-/**
- * @ingroup  pinsdriver
- * @brief Default Interrupt Handler for INT2_Client pin. 
- *        This is a predefined interrupt handler to be used together with the INT2_Client_SetInterruptHandler() method.
- *        This handler is called every time the INT2_Client ISR is executed. 
- * @pre Pins intializer called
- * @param none
- * @return none
- */
-void INT2_Client_DefaultInterruptHandler(void);
+void INT_pin1_DefaultInterruptHandler(void);
 
 
 #endif // PINS_H

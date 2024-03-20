@@ -12,7 +12,7 @@
 */
 
 /*
-© [2023] Microchip Technology Inc. and its subsidiaries.
+© [2024] Microchip Technology Inc. and its subsidiaries.
 
     Subject to your compliance with these terms, you may use Microchip 
     software and any derivatives exclusively with Microchip products. 
@@ -34,22 +34,21 @@
 
 #include "../pins.h"
 
-void (*INT1_Client_InterruptHandler)(void);
-void (*INT2_Client_InterruptHandler)(void);
+void (*INT_pin1_InterruptHandler)(void);
 
 void PIN_MANAGER_Initialize(void)
 {
    /**
     LATx registers
     */
-    LATA = 0x15;
+    LATA = 0x11;
     LATB = 0x80;
     LATC = 0x83;
 
     /**
     TRISx registers
     */
-    TRISA = 0x22;
+    TRISA = 0x24;
     TRISB = 0x60;
     TRISC = 0x60;
 
@@ -100,7 +99,9 @@ void PIN_MANAGER_Initialize(void)
     /**
     PPS registers
     */
+    U1RXPPS = 0x15; //RC5->UART1:RX1;
     SPI1SDIPPS = 0x16; //RC6->SPI1:SDI1;
+    RA1PPS = 0x16;  //RA1->UART2:TX2;
     RC4PPS = 0x13;  //RC4->UART1:TX1;
     RC3PPS = 0x1A;  //RC3->SPI1:SDO1;
     I2C1SCLPPS = 0x10;  //RC0->I2C1:SCL1;
@@ -113,7 +114,7 @@ void PIN_MANAGER_Initialize(void)
    /**
     IOCx registers 
     */
-    IOCAP = 0x2;
+    IOCAP = 0x4;
     IOCAN = 0x0;
     IOCAF = 0x0;
     IOCWP = 0x0;
@@ -122,12 +123,11 @@ void PIN_MANAGER_Initialize(void)
     IOCBP = 0x0;
     IOCBN = 0x0;
     IOCBF = 0x0;
-    IOCCP = 0x20;
+    IOCCP = 0x0;
     IOCCN = 0x0;
     IOCCF = 0x0;
 
-    INT1_Client_SetInterruptHandler(INT1_Client_DefaultInterruptHandler);
-    INT2_Client_SetInterruptHandler(INT2_Client_DefaultInterruptHandler);
+    INT_pin1_SetInterruptHandler(INT_pin1_DefaultInterruptHandler);
 
     // Enable PIE3bits.IOCIE interrupt 
     PIE3bits.IOCIE = 1; 
@@ -135,76 +135,41 @@ void PIN_MANAGER_Initialize(void)
   
 void PIN_MANAGER_IOC(void)
 {
-    // interrupt on change for pin INT1_Client
-    if(IOCAFbits.IOCAF1 == 1)
+    // interrupt on change for pin INT_pin1
+    if(IOCAFbits.IOCAF2 == 1)
     {
-        INT1_Client_ISR();  
-    }
-    // interrupt on change for pin INT2_Client
-    if(IOCCFbits.IOCCF5 == 1)
-    {
-        INT2_Client_ISR();  
+        INT_pin1_ISR();  
     }
 }
    
 /**
-   INT1_Client Interrupt Service Routine
+   INT_pin1 Interrupt Service Routine
 */
-void INT1_Client_ISR(void) {
+void INT_pin1_ISR(void) {
 
-    // Add custom INT1_Client code
+    // Add custom INT_pin1 code
 
     // Call the interrupt handler for the callback registered at runtime
-    if(INT1_Client_InterruptHandler)
+    if(INT_pin1_InterruptHandler)
     {
-        INT1_Client_InterruptHandler();
+        INT_pin1_InterruptHandler();
     }
-    IOCAFbits.IOCAF1 = 0;
+    IOCAFbits.IOCAF2 = 0;
 }
 
 /**
-  Allows selecting an interrupt handler for INT1_Client at application runtime
+  Allows selecting an interrupt handler for INT_pin1 at application runtime
 */
-void INT1_Client_SetInterruptHandler(void (* InterruptHandler)(void)){
-    INT1_Client_InterruptHandler = InterruptHandler;
+void INT_pin1_SetInterruptHandler(void (* InterruptHandler)(void)){
+    INT_pin1_InterruptHandler = InterruptHandler;
 }
 
 /**
-  Default interrupt handler for INT1_Client
+  Default interrupt handler for INT_pin1
 */
-void INT1_Client_DefaultInterruptHandler(void){
-    // add your INT1_Client interrupt custom code
-    // or set custom function using INT1_Client_SetInterruptHandler()
-}
-   
-/**
-   INT2_Client Interrupt Service Routine
-*/
-void INT2_Client_ISR(void) {
-
-    // Add custom INT2_Client code
-
-    // Call the interrupt handler for the callback registered at runtime
-    if(INT2_Client_InterruptHandler)
-    {
-        INT2_Client_InterruptHandler();
-    }
-    IOCCFbits.IOCCF5 = 0;
-}
-
-/**
-  Allows selecting an interrupt handler for INT2_Client at application runtime
-*/
-void INT2_Client_SetInterruptHandler(void (* InterruptHandler)(void)){
-    INT2_Client_InterruptHandler = InterruptHandler;
-}
-
-/**
-  Default interrupt handler for INT2_Client
-*/
-void INT2_Client_DefaultInterruptHandler(void){
-    // add your INT2_Client interrupt custom code
-    // or set custom function using INT2_Client_SetInterruptHandler()
+void INT_pin1_DefaultInterruptHandler(void){
+    // add your INT_pin1 interrupt custom code
+    // or set custom function using INT_pin1_SetInterruptHandler()
 }
 /**
  End of File

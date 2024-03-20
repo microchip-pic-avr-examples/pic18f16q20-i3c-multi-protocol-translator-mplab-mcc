@@ -5,13 +5,13 @@
  * 
  * @ingroup interrupt 
  * 
- * @brief This file contains the API implementation for the Interrupt Manager driver.
+ * @brief This file contains the API prototypes for the Interrupt Manager driver.
  * 
- * @version Interrupt Manager Driver Version 2.1.3
+ * @version Interrupt Manager Driver Version 2.0.4
 */
 
 /*
-© [2023] Microchip Technology Inc. and its subsidiaries.
+© [2024] Microchip Technology Inc. and its subsidiaries.
 
     Subject to your compliance with these terms, you may use Microchip 
     software and any derivatives exclusively with Microchip products. 
@@ -33,7 +33,7 @@
 
 #include "../../system/interrupt.h"
 #include "../../system/system.h"
-#include <stdbool.h>
+#include "../pins.h"
 
 void (*INT0_InterruptHandler)(void);
 void (*INT1_InterruptHandler)(void);
@@ -41,32 +41,8 @@ void (*INT2_InterruptHandler)(void);
 
 void  INTERRUPT_Initialize (void)
 {
-    INTCON0bits.IPEN = 1;
-
-    bool state = (unsigned char)GIE;
-    GIE = 0;
-    IVTLOCK = 0x55;
-    IVTLOCK = 0xAA;
-    IVTLOCKbits.IVTLOCKED = 0x00; // unlock IVT
-
-    IVTBASEU = 0;
-    IVTBASEH = 0;
-    IVTBASEL = 8;
-
-    IVTLOCK = 0x55;
-    IVTLOCK = 0xAA;
-    IVTLOCKbits.IVTLOCKED = 0x01; // lock IVT
-
-    GIE = state;
-    // Assign peripheral interrupt priority vectors
-    IPR1bits.DMA2DCNTIP = 1;
-    IPR3bits.IOCIP = 1;
-    IPR7bits.I2C1RXIP = 1;
-    IPR7bits.I2C1TXIP = 1;
-    IPR7bits.I2C1IP = 1;
-    IPR7bits.I2C1EIP = 1;
-    IPR9bits.I3C2IP = 1;
-    IPR9bits.I3C2RIP = 1;
+    // Disable Interrupt Priority Vectors (16CXXX Compatibility Mode)
+    INTCON0bits.IPEN = 0;
 
     // Clear the interrupt flag
     // Set the external interrupt edge detect
@@ -94,24 +70,75 @@ void  INTERRUPT_Initialize (void)
 
 }
 
-void __interrupt(irq(default),base(8)) Default_ISR()
-{
-}
-
-void __interrupt(irq(IOC), base(8)) IOC_ISR()
-{
-    PIN_MANAGER_IOC();
-}
-
-
 /**
  * @ingroup interrupt
- * @brief Executes whenever the signal on the INT0 pin transitions on the selected edge.
+ * @brief Executes whenever a high-priority interrupt is triggered. This routine checks the source of the interrupt and calls the relevant interrupt function.
  * @pre INTERRUPT_Initialize() is already called.
  * @param None.
  * @return None.
  */
-void __interrupt(irq(INT0),base(8)) INT0_ISR()
+void __interrupt() INTERRUPT_InterruptManager (void)
+{
+    // interrupt handler
+    if(PIE3bits.IOCIE == 1 && PIR3bits.IOCIF == 1)
+    {
+        PIN_MANAGER_IOC();
+    }
+    else if(PIE9bits.I3C2RIE == 1 && PIR9bits.I3C2RIF == 1)
+    {
+        I3C2_Reset_ISR();
+    }
+    else if(PIE9bits.I3C2IE == 1 && PIR9bits.I3C2IF == 1)
+    {
+        I3C2_General_ISR();
+    }
+    else if(PIE1bits.DMA2DCNTIE == 1 && PIR1bits.DMA2DCNTIF == 1)
+    {
+        DMA2_DMADCNTI_ISR();
+    }
+    else if(PIE7bits.SPI1TXIE == 1 && PIR7bits.SPI1TXIF == 1)
+    {
+        SPI1_Transmit_ISR();
+    }
+    else if(PIE7bits.SPI1IE == 1 && PIR7bits.SPI1IF == 1)
+    {
+        SPI1_ISR();
+    }
+    else if(PIE7bits.SPI1RXIE == 1 && PIR7bits.SPI1RXIF == 1)
+    {
+        SPI1_Receive_ISR();
+    }
+    else if(PIE6bits.U1TXIE == 1 && PIR6bits.U1TXIF == 1)
+    {
+        UART1_TxInterruptHandler();
+    }
+    else if(PIE6bits.U1RXIE == 1 && PIR6bits.U1RXIF == 1)
+    {
+        UART1_RxInterruptHandler();
+    }
+    else if(PIE7bits.I2C1EIE == 1 && PIR7bits.I2C1EIF == 1)
+    {
+        I2C1_ERROR_ISR();
+    }
+    else if(PIE7bits.I2C1RXIE == 1 && PIR7bits.I2C1RXIF == 1)
+    {
+        I2C1_RX_ISR();
+    }
+    else if(PIE7bits.I2C1IE == 1 && PIR7bits.I2C1IF == 1)
+    {
+        I2C1_ISR();
+    }
+    else if(PIE7bits.I2C1TXIE == 1 && PIR7bits.I2C1TXIF == 1)
+    {
+        I2C1_TX_ISR();
+    }
+    else
+    {
+        //Unhandled Interrupt
+    }
+}
+
+void INT0_ISR(void)
 {
     EXT_INT0_InterruptFlagClear();
 
@@ -137,15 +164,7 @@ void INT0_DefaultInterruptHandler(void){
     // add your INT0 interrupt custom code
     // or set custom function using INT0_SetInterruptHandler()
 }
-
-/**
- * @ingroup interrupt
- * @brief Executes whenever the signal on the INT1 pin transitions on the selected edge.
- * @pre INTERRUPT_Initialize() is already called.
- * @param None.
- * @return None.
- */
-void __interrupt(irq(INT1),base(8)) INT1_ISR()
+void INT1_ISR(void)
 {
     EXT_INT1_InterruptFlagClear();
 
@@ -171,15 +190,7 @@ void INT1_DefaultInterruptHandler(void){
     // add your INT1 interrupt custom code
     // or set custom function using INT1_SetInterruptHandler()
 }
-
-/**
- * @ingroup interrupt
- * @brief Executes whenever the signal on the INT2 pin transitions on the selected edge.
- * @pre INTERRUPT_Initialize() is already called.
- * @param None.
- * @return None.
- */
-void __interrupt(irq(INT2),base(8)) INT2_ISR()
+void INT2_ISR(void)
 {
     EXT_INT2_InterruptFlagClear();
 

@@ -5,12 +5,15 @@
  * 
  * @ingroup config_bitsdriver
  * 
- * @brief This is the generated Device Configuration bits file.
+ * @brief This file contains the API implementation for the Device Configuration Bits driver.
  *
- * @version Driver Version 1.0.0
+ * @version Driver Version 1.0.1
+ *
+ * @version Package Version 1.0.2
 */
+
 /*
-© [2023] Microchip Technology Inc. and its subsidiaries.
+© [2024] Microchip Technology Inc. and its subsidiaries.
 
     Subject to your compliance with these terms, you may use Microchip 
     software and any derivatives exclusively with Microchip products. 
@@ -48,7 +51,7 @@
 //CONFIG3
 #pragma config MCLRE = EXTMCLR     // MCLR Enable bit->If LVP = 0, MCLR pin is MCLR; If LVP = 1, RE3 pin function is MCLR 
 #pragma config PWRTS = PWRT_OFF     // Power-up timer selection bits->PWRT is disabled
-#pragma config MVECEN = ON     // Multi-vector enable bit->Multi-vector enabled, Vector table used for interrupts
+#pragma config MVECEN = OFF     // Multi-vector enable bit->Interrupt contoller does not use vector table to prioritze interrupts
 #pragma config IVT1WAY = ON     // IVTLOCK bit One-way set enable bit->IVTLOCKED bit can be cleared and set only once
 #pragma config LPBOREN = OFF     // Low Power BOR Enable bit->Low-Power BOR disabled
 #pragma config BOREN = SBOREN     // Brown-out Reset Enable bits->Brown-out Reset enabled according to SBOREN
@@ -58,7 +61,6 @@
 #pragma config PPS1WAY = ON     // PPSLOCK bit One-Way Set Enable bit->PPSLOCKED bit can be cleared and set only once; PPS registers remain locked after one clear/set cycle
 #pragma config STVREN = ON     // Stack Full/Underflow Reset Enable bit->Stack full/underflow will cause Reset
 #pragma config LVP = ON     // Low Voltage Programming Enable bit->Low voltage programming enabled. MCLR/VPP pin function is MCLR. MCLRE configuration bit is ignored
-#pragma config DEBUG = OFF     // Debug enable bit->Backround debugger disabled
 #pragma config XINST = OFF     // Extended Instruction Set Enable bit->Extended Instruction Set and Indexed Addressing Mode disabled
 
 //CONFIG5
