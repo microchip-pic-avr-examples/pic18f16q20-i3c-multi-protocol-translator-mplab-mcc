@@ -3,10 +3,11 @@
 #include "mcc_generated_files/system/system.h"
 #include <stdbool.h>
 #include <stdarg.h>
+
 #define IBI_PAYLOAD_BUFFER_SIZE (MAX_DATA_SIZE_IN_I2C_SPI_BUS)
-#define I3C_TARGET_RESET_ACTION_CLIENT_RESET 0x40 // The RSTACT Defining Byte value for resetting client devices (obtained from values reserved for venbndors))
-#define SOFT_TIME_OUT_VALUE (40000U)
-#define RESET_TIME_MS 100
+#define I3C_TARGET_RESET_ACTION_CLIENT_RESET 0x40 //The RSTACT Defining Byte value for resetting client devices (obtained from values reserved for vendors)
+#define SOFT_TIME_OUT_VALUE (40000U) //Max value of counter to set time-out in I2C Read/Write operations
+#define CLIENT_RESET_TIME_MS 100  //The time to keep reset pin low to reset client device 
 #define CLIENT_ID_BIT_POSN 0
 #define CLIENT_ID_BIT_MASK 0x1F
 #define UART_DEVICE_ID_BIT_POSN 3
@@ -14,15 +15,15 @@
 #define CMD_ID_BIT_MASK (0x60)
 #define CMD_ID_BIT_POSN 5
 #define RESET_PINS_BIT_MASK 0x1
+#define IBI_MDB_FOR_I2C_SPI_READ 0x00
+#define IBI_MDB_FOR_UART_READ 0x03
 
 #define DEBUG_PRINT_ON 
 
 uint8_t ibiPayloadBuffer[IBI_PAYLOAD_BUFFER_SIZE]; //Buffer to store data received in I2C/SPI/UART Read and is send to the controller via IBI
 uint8_t errorStatus[1]; //Buffer to store error status which is send to controller via Private Read 
 uint8_t resetPinsSelect = 0;
-static uint32_t count = 0; //Count for time-out in I2C Read/Write operations
-static volatile uint16_t ibiBufferIndex = 0;
-static uint8_t stopCommand = 0;
+static uint8_t stopCommand = 0; //Stop byte value which is compared with data received in UART receiver. The received data already stored in buffer is sent to Controller when this stop byte is received.
 volatile bool isSPITransmitComplete = false;
 volatile bool isSPIReceiveComplete = false;
 
@@ -30,22 +31,27 @@ static void CS1Select(void)
 {
     CS1_SetLow();
 }
+
 static void CS2Select(void)
 {
     CS2_SetLow();
 }
+
 static void CS3Select(void)
 {
     CS3_SetLow();
 }
+
 static void CS1DeSelect(void)
 {
     CS1_SetHigh();
 }
+
 static void CS2DeSelect(void)
 {
     CS2_SetHigh();
 }
+
 static void CS3DeSelect(void)
 {
     CS3_SetHigh();
@@ -53,12 +59,12 @@ static void CS3DeSelect(void)
 
 static void RST1High(void)
 {
-    RST_pin1_SetHigh();
+    RST_PIN1_SetHigh();
 }
 
 static void RST1Low(void)
 {
-    RST_pin1_SetLow();
+    RST_PIN1_SetLow();
 }
 
 static void (*CS_SetHigh[])(void) = {CS1DeSelect,CS2DeSelect,CS3DeSelect};
@@ -101,6 +107,7 @@ static void ResetPinSetHigh(uint8_t resetPin)
         resetPin >>= 1;
     }
 }
+
 static void ResetPinSetLow(uint8_t resetPin)
 {
     for(uint8_t i =0;resetPin!=0;i++)
@@ -115,7 +122,7 @@ static void ResetPinSetLow(uint8_t resetPin)
 
 enum CONTROLLER_COMMAND DecodeCommand(uint8_t functionID)
 {
-    enum COMMAND_ID commandIDValue = (functionID & CMD_ID_BIT_MASK)>>CMD_ID_BIT_POSN;
+    enum COMMAND_DEVICE_ID commandIDValue = (functionID & CMD_ID_BIT_MASK)>>CMD_ID_BIT_POSN;
     uint8_t clientID = (functionID & CLIENT_ID_BIT_MASK)>>CLIENT_ID_BIT_POSN;
     uint8_t uartDeviceID = (functionID & UART_DEVICE_ID_BIT_MASK)>>UART_DEVICE_ID_BIT_POSN;
 
@@ -123,9 +130,9 @@ enum CONTROLLER_COMMAND DecodeCommand(uint8_t functionID)
     {
         if (uartDeviceID == UART1_DEVICE_ID || clientID == UART2_DEVICE_ID) 
         {
-            return UART_READ_COMMAND;
+            return SET_UART_READ_STOP_BYTE_COMMAND;
         } 
-        else if (uartDeviceID == UART_INCORRECT_DEVICE_ID) 
+        else if (uartDeviceID >= UART2_DEVICE_ID) 
         {
             return INCORRECT_COMMAND;
         }
@@ -144,7 +151,7 @@ enum CONTROLLER_COMMAND DecodeCommand(uint8_t functionID)
         {
             return UART_WRITE_COMMAND;
         }
-        else if (uartDeviceID == UART_INCORRECT_DEVICE_ID) 
+        else if (uartDeviceID >= UART2_DEVICE_ID) 
         {
             return INCORRECT_COMMAND;
         }
@@ -159,7 +166,7 @@ enum CONTROLLER_COMMAND DecodeCommand(uint8_t functionID)
     }
     else if (commandIDValue == CLIENT_RESET_COMMAND_ID)
     {
-        return CLIENT_RESET_COMMAND;
+        return ASSIGN_CLIENT_RESET_COMMAND;
     }
     else
     {
@@ -171,7 +178,7 @@ void ExecuteI2CWriteCommand(uint8_t clientAddress, uint8_t *writeData, uint16_t 
 {
     bool i2cBusTimeOut = false;
     bool i2cWriteTimeOut = false;
-    count = 0;
+    uint32_t count = 0; //Count for time-out in I2C Write operation
     i2c_host_error_t i2cErrorStatus;
     
     clientAddress = clientAddress >> 1;  // Right shifting to remove R/W bit from address header
@@ -183,7 +190,7 @@ void ExecuteI2CWriteCommand(uint8_t clientAddress, uint8_t *writeData, uint16_t 
         if(count > SOFT_TIME_OUT_VALUE)
         {
             i2cBusTimeOut = true;
-            debugPrinter("[!] Timeout due to I2C Bus Busy\r\n");
+            debugPrinter("[!] Timeout due to I2C Bus Busy \r\n");
             break;
         }
     }
@@ -210,34 +217,32 @@ void ExecuteI2CWriteCommand(uint8_t clientAddress, uint8_t *writeData, uint16_t 
             }
             else
             {
-                ErrorReporting(i2cErrorStatus);
+                I2CErrorReporting(i2cErrorStatus);
             }   
         }
         else
         {
-            errorStatus[0] = 0x2;
+            errorStatus[0] = I2C_WRITE_TIMEOUT_ERROR_CODE;
             I3C2_BufferTransmit(errorStatus, 1);
         }
     }
     else
     {
-        errorStatus[0] = 0x1;
+        errorStatus[0] = I2C_BUS_TIMEOUT_ERROR_CODE;
         I3C2_BufferTransmit(errorStatus, 1);
     } 
 }
 
-void ExecuteI2CReadCommand(uint8_t clientAddress, uint8_t readDataLengthHigh, uint8_t readDataLengthLow)
+void ExecuteI2CReadCommand(uint8_t clientAddress, uint16_t readDataLength)
 {
     bool i2cBusTimeOut = false;
     bool i2cReadTimeOut = false;
-    uint16_t readDataLength;
-    count = 0;
+    uint32_t count = 0; //Count for time-out in I2C Read operation
     enum I3C_TARGET_IBI_REQUEST_ERROR ibiError;
     i2c_host_error_t i2cErrorStatus;
     
     clientAddress = clientAddress >> 1;  // Right shifting to remove R/W bit from address header
-    readDataLength = (uint16_t)((readDataLengthHigh << 8) + readDataLengthLow);
-    
+ 
     debugPrinter("I2C Read initiated \r\n");
     while(!I2C1_Read(clientAddress,ibiPayloadBuffer,readDataLength))
     {    
@@ -245,7 +250,7 @@ void ExecuteI2CReadCommand(uint8_t clientAddress, uint8_t readDataLengthHigh, ui
         if(count > SOFT_TIME_OUT_VALUE)
         {
             i2cBusTimeOut = true;
-            debugPrinter("[!] Timeout due to I2C Bus Busy\r\n");
+            debugPrinter("[!] Timeout due to I2C Bus Busy \r\n");
             break;
         }
     }
@@ -267,24 +272,24 @@ void ExecuteI2CReadCommand(uint8_t clientAddress, uint8_t readDataLengthHigh, ui
             i2cErrorStatus = I2C1_Host.ErrorGet();
             if (i2cErrorStatus == I2C_ERROR_NONE)
             {
-                debugPrinter("Data received in I2C Read\r\n");
+                debugPrinter("Data received in I2C Read \r\n");
                 for (uint16_t i = 0; i < readDataLength; i++) 
                 {
                     debugPrinter("%x \t", ibiPayloadBuffer[i]);
                 }
                 debugPrinter("\n");
-                I3C2_IBIMandatoryDataByteSet(0x00);
+                I3C2_IBIMandatoryDataByteSet(IBI_MDB_FOR_I2C_SPI_READ);
                 ibiError = I3C2_IBIRequest(ibiPayloadBuffer, readDataLength);
                 IBIErrorHandling(ibiError);
             }
             else
             {
-                ErrorReporting(i2cErrorStatus);
+                I2CErrorReporting(i2cErrorStatus);
             }   
         }
         else
         {
-            errorStatus[0] = I2C_READ_WRITE_TIMEOUT_ERROR_CODE;
+            errorStatus[0] = I2C_READ_TIMEOUT_ERROR_CODE;
             I3C2_BufferTransmit(errorStatus, 1);
         }
     }
@@ -297,7 +302,7 @@ void ExecuteI2CReadCommand(uint8_t clientAddress, uint8_t readDataLengthHigh, ui
 
 void ExecuteSPIWriteCommand(uint8_t functionID, uint8_t *writeData, uint16_t writeLength)
 {
-    debugPrinter("SPI Write initiated\r\n");
+    debugPrinter("SPI Write initiated \r\n");
     uint8_t spiClientID = (functionID & CLIENT_ID_BIT_MASK)>>CLIENT_ID_BIT_POSN;
     SPI1_Open(HOST_CONFIG);
     ClientSelect(spiClientID);
@@ -312,14 +317,12 @@ void ExecuteSPIWriteCommand(uint8_t functionID, uint8_t *writeData, uint16_t wri
     debugPrinter("SPI Write successful \r\n");
 }
 
-void ExecuteSPIReadCommand(uint8_t functionID, uint8_t readDataLengthHigh, uint8_t readDataLengthLow)
+void ExecuteSPIReadCommand(uint8_t functionID, uint16_t readDataLength)
 {
-    debugPrinter("SPI Read initiated\r\n");
+    debugPrinter("SPI Read initiated \r\n");
     enum I3C_TARGET_IBI_REQUEST_ERROR ibiError;
-    uint16_t readDataLength;
     uint8_t spiClientID = (functionID & CLIENT_ID_BIT_MASK)>>CLIENT_ID_BIT_POSN;
     
-    readDataLength = (uint16_t)((readDataLengthHigh << 8) + readDataLengthLow);
     SPI1_Open(HOST_CONFIG);
     ClientSelect(spiClientID);
     SPI1_BufferRead(ibiPayloadBuffer, readDataLength);
@@ -331,50 +334,51 @@ void ExecuteSPIReadCommand(uint8_t functionID, uint8_t readDataLengthHigh, uint8
     ClientDeselect(spiClientID);
     SPI1_Close();
 
-    debugPrinter("Data received in SPI Read\r\n");
+    debugPrinter("Data received in SPI Read \r\n");
     for (uint8_t i = 0; i < readDataLength; i++) 
     {
         debugPrinter("%x \t", ibiPayloadBuffer[i]);
     }
     debugPrinter("\n");
-    I3C2_IBIMandatoryDataByteSet(0x00);
+    I3C2_IBIMandatoryDataByteSet(IBI_MDB_FOR_I2C_SPI_READ);
     ibiError = I3C2_IBIRequest(ibiPayloadBuffer, readDataLength);
     IBIErrorHandling(ibiError);
 }
 
-void ExecuteUARTWriteCommand(uint8_t functionID, uint8_t *writeData, uint16_t writeLength)
+void ExecuteUARTWriteCommand(uint8_t functionID, uint8_t *writeData, uint16_t writeLength) 
 {
-   uint8_t uartDeviceID = (functionID & UART_DEVICE_ID_BIT_MASK)>>UART_DEVICE_ID_BIT_POSN;
-   if(uartDeviceID == UART1_DEVICE_ID)
-   {
-       for(uint16_t i =0; i< writeLength; i++)
-       {
-        debugPrinter("Check if TX ready \r\n");
-        while(!UART_PROTOCOL_PORT.IsTxReady());
-        UART_PROTOCOL_PORT.Write(*writeData++);
-       }
-   }
-   else if(uartDeviceID == UART2_DEVICE_ID)
-   {
-       for(uint16_t i =0; i< writeLength; i++)
-       {
-        debugPrinter("Check if TX ready \r\n");
-        while(!DEBUG_PORT.IsTxReady());
-        DEBUG_PORT.Write(*writeData++);
-       }
-   }
-}
-void ExecuteUARTReadCommand(uint8_t functionID, uint8_t stopByteCommandValue)
-{
-   uint8_t uartClientID = (functionID & UART_DEVICE_ID_BIT_MASK)>>UART_DEVICE_ID_BIT_POSN;
-   if(uartClientID == UART1_DEVICE_ID)
-   {
-     stopCommand = stopByteCommandValue;
-     debugPrinter("Stop Command %x \r\n", stopCommand);
-   }
+    uint8_t uartDeviceID = (functionID & UART_DEVICE_ID_BIT_MASK) >> UART_DEVICE_ID_BIT_POSN;
+    if (uartDeviceID == UART1_DEVICE_ID) 
+    {
+        for (uint16_t i = 0; i < writeLength; i++) 
+        {
+            debugPrinter("Check if TX ready \r\n");
+            while (!UART_PROTOCOL_PORT.IsTxReady());
+            UART_PROTOCOL_PORT.Write(*writeData++);
+        }
+    } 
+    else if (uartDeviceID == UART2_DEVICE_ID) 
+    {
+        for (uint16_t i = 0; i < writeLength; i++) 
+        {
+            debugPrinter("Check if TX ready \r\n");
+            while (!DEBUG_PORT.IsTxReady());
+            DEBUG_PORT.Write(*writeData++);
+        }
+    }
 }
 
-void ExecuteClientResetCommand(uint8_t resetPinNumber)
+void ExecuteSetUARTReadStopByteCommand(uint8_t functionID, uint8_t stopByteCommandValue) 
+{
+    uint8_t uartClientID = (functionID & UART_DEVICE_ID_BIT_MASK) >> UART_DEVICE_ID_BIT_POSN;
+    if (uartClientID == UART1_DEVICE_ID) 
+    {
+        stopCommand = stopByteCommandValue;
+        debugPrinter("Stop Command %x \r\n", stopCommand);
+    }
+}
+
+void ExecuteAssignClientResetCommand(uint8_t resetPinNumber)
 {
     resetPinsSelect = resetPinNumber & RESET_PINS_BIT_MASK;
 }
@@ -393,7 +397,7 @@ void ExecuteResetAction(void)
         
         //Reset pin selected based on previous reset command received from controller
         ResetPinSetLow(resetPinsSelect);  
-        __delay_ms(RESET_TIME_MS);  
+        __delay_ms(CLIENT_RESET_TIME_MS);  
         ResetPinSetHigh(resetPinsSelect);  
         
         //Clearing reset pin selection. Controller has to send command with reset pin number if a client has to be reset again
@@ -401,7 +405,7 @@ void ExecuteResetAction(void)
     }
     else if(resetAction == I3C_RESET_ACTION_RESET_PERIPHERAL)
     {
-        debugPrinter("I3C_RESET_ACTION_RESET_PERIPHERAL\r\n");
+        debugPrinter("I3C_RESET_ACTION_RESET_PERIPHERAL \r\n");
 
         //Reset I3C2 peripheral
         I3C2_PeripheralReset();
@@ -411,7 +415,7 @@ void ExecuteResetAction(void)
     }
     else if(resetAction == I3C_RESET_ACTION_RESET_WHOLE_TARGET)
     {
-        debugPrinter("I3C_RESET_ACTION_RESET_WHOLE_TARGET\r\n");
+        debugPrinter("I3C_RESET_ACTION_RESET_WHOLE_TARGET \r\n");
    
         //Soft reset of microcontroller
         RESET();
@@ -422,7 +426,7 @@ void SendAlertFromClient(uint8_t intPinNumber)
 {
     enum I3C_TARGET_IBI_REQUEST_ERROR ibiError;
     I3C2_IBIMandatoryDataByteSet(intPinNumber);
-    ibiError = I3C2_IBIRequest(NULL, 0);
+    ibiError = I3C2_IBIRequest(NULL, 0); // IBI is sent with interrupt pin as MDB and without payload
     IBIErrorHandling(ibiError);
 }
 
@@ -446,7 +450,7 @@ void IBIErrorHandling(enum I3C_TARGET_IBI_REQUEST_ERROR ibiStatusError)
     }
 }
 
-void ErrorReporting(i2c_host_error_t i2cErrorStatus)
+void I2CErrorReporting(i2c_host_error_t i2cErrorStatus)
 {
     if (i2cErrorStatus == I2C_ERROR_ADDR_NACK) 
     {
@@ -463,7 +467,7 @@ void ErrorReporting(i2c_host_error_t i2cErrorStatus)
     else if (i2cErrorStatus == I2C_ERROR_BUS_COLLISION) 
     {
         errorStatus[0] = I2C_BUS_COLLISION_ERROR_CODE;
-        debugPrinter("Bus Collision Error\r\n");
+        debugPrinter("Bus Collision Error \r\n");
         I3C2_BufferTransmit(errorStatus, 1);
     }
 }
@@ -477,31 +481,26 @@ void SPI1_RxCompleteUserInterruptHandler(void)
 {
     isSPIReceiveComplete = true;
 }
-void UARTProtocolRxBufferProcessing(void)
+
+void UARTProtocolRxBufferProcessing(void) 
 {
-   uint16_t tempBufferIndex = ibiBufferIndex;
-   uint8_t readData = UART_PROTOCOL_PORT.Read();
-   enum I3C_TARGET_IBI_REQUEST_ERROR ibiError;
-  
-   ibiPayloadBuffer[tempBufferIndex] = readData;
-   tempBufferIndex++;
-   ibiBufferIndex = tempBufferIndex;
-   if(readData == stopCommand) 
-   {
-        I3C2_IBIMandatoryDataByteSet(0x03);
-        ibiError = I3C2_IBIRequest(ibiPayloadBuffer,tempBufferIndex);
-        IBIErrorHandling(ibiError);  
+    static uint16_t ibiBufferIndex = 0;
+    enum I3C_TARGET_IBI_REQUEST_ERROR ibiError;
+    if ((ibiPayloadBuffer[ibiBufferIndex++] = UART_PROTOCOL_PORT.Read()) == stopCommand) 
+    {
+        I3C2_IBIMandatoryDataByteSet(IBI_MDB_FOR_UART_READ);
+        ibiError = I3C2_IBIRequest(ibiPayloadBuffer, ibiBufferIndex);
+        IBIErrorHandling(ibiError);
         ibiBufferIndex = 0;
-    } 
+    }
 }
 
-void debugPrinter(char* format, ...)
+void debugPrinter(char* format, ...) 
 {
-    
 #ifdef DEBUG_PRINT_ON
     va_list argptr;
     va_start(argptr, format);
-    vprintf(format , argptr);
+    vprintf(format, argptr);
     va_end(argptr);
 #endif
 }

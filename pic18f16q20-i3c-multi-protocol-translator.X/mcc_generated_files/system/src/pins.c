@@ -34,7 +34,7 @@
 
 #include "../pins.h"
 
-void (*INT_pin1_InterruptHandler)(void);
+void (*INT_PIN1_InterruptHandler)(void);
 
 void PIN_MANAGER_Initialize(void)
 {
@@ -127,7 +127,7 @@ void PIN_MANAGER_Initialize(void)
     IOCCN = 0x0;
     IOCCF = 0x0;
 
-    INT_pin1_SetInterruptHandler(INT_pin1_DefaultInterruptHandler);
+    INT_PIN1_SetInterruptHandler(INT_PIN1_DefaultInterruptHandler);
 
     // Enable PIE3bits.IOCIE interrupt 
     PIE3bits.IOCIE = 1; 
@@ -135,41 +135,41 @@ void PIN_MANAGER_Initialize(void)
   
 void PIN_MANAGER_IOC(void)
 {
-    // interrupt on change for pin INT_pin1
+    // interrupt on change for pin INT_PIN1
     if(IOCAFbits.IOCAF2 == 1)
     {
-        INT_pin1_ISR();  
+        INT_PIN1_ISR();  
     }
 }
    
 /**
-   INT_pin1 Interrupt Service Routine
+   INT_PIN1 Interrupt Service Routine
 */
-void INT_pin1_ISR(void) {
+void INT_PIN1_ISR(void) {
 
-    // Add custom INT_pin1 code
+    // Add custom INT_PIN1 code
 
     // Call the interrupt handler for the callback registered at runtime
-    if(INT_pin1_InterruptHandler)
+    if(INT_PIN1_InterruptHandler)
     {
-        INT_pin1_InterruptHandler();
+        INT_PIN1_InterruptHandler();
     }
     IOCAFbits.IOCAF2 = 0;
 }
 
 /**
-  Allows selecting an interrupt handler for INT_pin1 at application runtime
+  Allows selecting an interrupt handler for INT_PIN1 at application runtime
 */
-void INT_pin1_SetInterruptHandler(void (* InterruptHandler)(void)){
-    INT_pin1_InterruptHandler = InterruptHandler;
+void INT_PIN1_SetInterruptHandler(void (* InterruptHandler)(void)){
+    INT_PIN1_InterruptHandler = InterruptHandler;
 }
 
 /**
-  Default interrupt handler for INT_pin1
+  Default interrupt handler for INT_PIN1
 */
-void INT_pin1_DefaultInterruptHandler(void){
-    // add your INT_pin1 interrupt custom code
-    // or set custom function using INT_pin1_SetInterruptHandler()
+void INT_PIN1_DefaultInterruptHandler(void){
+    // add your INT_PIN1 interrupt custom code
+    // or set custom function using INT_PIN1_SetInterruptHandler()
 }
 /**
  End of File

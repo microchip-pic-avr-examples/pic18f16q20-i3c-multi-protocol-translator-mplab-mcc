@@ -32,7 +32,7 @@
 */
 #include "mcc_generated_files/system/system.h"
 #include "application.h"
-#define PRIVATE_WRITE_BUFFER_SIZE (MAX_DATA_SIZE_IN_I2C_SPI_BUS + FUNCTION_ID_SIZE  + I2C_ADDRESS_SIZE + 1) 
+#define PRIVATE_WRITE_BUFFER_SIZE (MAX_DATA_SIZE_IN_I2C_SPI_BUS + FUNCTION_ID_SIZE  + I2C_ADDRESS_SIZE + 1) //1 is added as per I3C Driver requirement
 
 uint8_t receiveDataBuffer[PRIVATE_WRITE_BUFFER_SIZE]; //Buffer to store data received from the I3C controller
 uint16_t numberOfBytesReceived;
@@ -43,7 +43,7 @@ enum CONTROLLER_COMMAND commandReceived;
 enum I3C_TARGET_HJ_REQUEST_ERROR hjRequestErrorState;
 
 void ResetPatternDetectedCallback(void);
-void INT_pin1_UserInterruptHandler(void);
+void INT_PIN1_UserInterruptHandler(void);
 void TransactionCompleteCallback(struct I3C_TARGET_TRANSACTION_COMPLETE_STATUS *transactionCompleteStatus);
 
 /*
@@ -62,7 +62,7 @@ int main(void)
      //Register user custom callback
     I3C2_TransactionCompleteCallbackRegister(TransactionCompleteCallback); 
     I3C2_ResetPatternDetectedCallbackRegister(ResetPatternDetectedCallback);
-    INT_pin1_SetInterruptHandler(INT_pin1_UserInterruptHandler);
+    INT_PIN1_SetInterruptHandler(INT_PIN1_UserInterruptHandler);
     SPI1_Host.TxCompleteCallbackRegister(SPI1_TxCompleteUserInterruptHandler);
     SPI1_Host.RxCompleteCallbackRegister(SPI1_RxCompleteUserInterruptHandler);
 
@@ -76,6 +76,7 @@ int main(void)
     // Disable the Global Interrupts 
     //INTERRUPT_GlobalInterruptDisable(); 
 
+    //Delay added to observe first message printed after reset
     __delay_ms(1000);
     debugPrinter("*****Multi-Protocol Translator using I3C*****\r\n");
     
@@ -88,7 +89,7 @@ int main(void)
                 
                 //Request for hot-Join
                 hjRequestErrorState = I3C2_HotJoinRequest();
-                debugPrinter("Status of Hot-Join Request: %u\r\n",hjRequestErrorState);
+                debugPrinter("Status of Hot-Join Request: %u \r\n",hjRequestErrorState);
                 
                 debugPrinter("Waiting for Dynamic address to be assigned \r\n");
                 while(I3C2_HotJoinStatusGet() == I3C_TARGET_HJ_PENDING);
@@ -114,42 +115,46 @@ int main(void)
                     {
                         case I2C_WRITE_COMMAND:      
                             debugPrinter("Command received : I2C Write \r\n");
-                            ExecuteI2CWriteCommand(receiveDataBuffer[I2C_ADDRESS_INDEX],receiveDataBuffer+2,numberOfBytesReceived-2);
+                            ExecuteI2CWriteCommand(receiveDataBuffer[I2C_ADDRESS_INDEX],receiveDataBuffer+I2C_DATA_INDEX,numberOfBytesReceived-I2C_DATA_INDEX);
                             break;  
                             
                         case I2C_READ_COMMAND:
                             debugPrinter("Command received : I2C Read \r\n");
-                            ExecuteI2CReadCommand(receiveDataBuffer[I2C_ADDRESS_INDEX],receiveDataBuffer[I2C_READ_BUFFER_SIZE_HIGH_INDEX],receiveDataBuffer[I2C_READ_BUFFER_SIZE_LOW_INDEX]);
+                            ExecuteI2CReadCommand(receiveDataBuffer[I2C_ADDRESS_INDEX],(uint16_t)((receiveDataBuffer[I2C_READ_BUFFER_SIZE_HIGH_INDEX] <<8) + receiveDataBuffer[I2C_READ_BUFFER_SIZE_LOW_INDEX]));
                             break;
                             
                         case SPI_WRITE_COMMAND:                            
                             debugPrinter("Command received : SPI Write \r\n");
-                            ExecuteSPIWriteCommand(receiveDataBuffer[FUNCTION_ID_INDEX],receiveDataBuffer+1,numberOfBytesReceived-1);
+                            ExecuteSPIWriteCommand(receiveDataBuffer[FUNCTION_ID_INDEX],receiveDataBuffer+SPI_DATA_INDEX,numberOfBytesReceived-SPI_DATA_INDEX);
                             break;
                             
                         case SPI_READ_COMMAND:                           
                             debugPrinter("Command received : SPI Read \r\n");
-                            ExecuteSPIReadCommand(receiveDataBuffer[FUNCTION_ID_INDEX],receiveDataBuffer[SPI_READ_BUFFER_SIZE_HIGH_INDEX], receiveDataBuffer[SPI_READ_BUFFER_SIZE_LOW_INDEX]);
+                            ExecuteSPIReadCommand(receiveDataBuffer[FUNCTION_ID_INDEX],(uint16_t)((receiveDataBuffer[SPI_READ_BUFFER_SIZE_HIGH_INDEX] << 8) + receiveDataBuffer[SPI_READ_BUFFER_SIZE_LOW_INDEX]));
                             break;
                             
                         case UART_WRITE_COMMAND:
                             debugPrinter("Command received : UART Write \r\n");
-                            ExecuteUARTWriteCommand(receiveDataBuffer[FUNCTION_ID_INDEX],receiveDataBuffer+1,numberOfBytesReceived-1);
+                            ExecuteUARTWriteCommand(receiveDataBuffer[FUNCTION_ID_INDEX],receiveDataBuffer+UART_DATA_INDEX,numberOfBytesReceived-UART_DATA_INDEX);
                             break;
                             
-                        case UART_READ_COMMAND:
+                        case SET_UART_READ_STOP_BYTE_COMMAND:
                             debugPrinter("Command received : UART Read \r\n");
-                            ExecuteUARTReadCommand(receiveDataBuffer[FUNCTION_ID_INDEX],receiveDataBuffer[UART_READ_STOP_BYTE_INDEX]);
+                            ExecuteSetUARTReadStopByteCommand(receiveDataBuffer[FUNCTION_ID_INDEX],receiveDataBuffer[UART_READ_STOP_BYTE_INDEX]);
                             break;
                             
-                        case CLIENT_RESET_COMMAND:
+                        case ASSIGN_CLIENT_RESET_COMMAND:
                             debugPrinter("Command Received : Reset Client Device \r\n");
-                            ExecuteClientResetCommand(receiveDataBuffer[CLIENT_RESET_PIN_INDEX]);
+                            ExecuteAssignClientResetCommand(receiveDataBuffer[CLIENT_RESET_PIN_INDEX]);
                             break;
                             
                         case INCORRECT_COMMAND:
                             debugPrinter("Incorrect Command Received \r\n");
                             break;
+                        
+                        default:
+                            debugPrinter("Incorrect Command Received \r\n");
+                            break;       
                     }
                     //Setup to receive data in next private write transaction
                     I3C2_BufferReceive(receiveDataBuffer,sizeof(receiveDataBuffer)); 
@@ -170,9 +175,11 @@ int main(void)
                 }
                 if(isInterrupt1Received)  // Checking if interrupts have occurred on any client devices
                 {
-                    SendAlertFromClient(0x01);
+                    SendAlertFromClient(INT_PIN1);
                     isInterrupt1Received = false;
                 }
+                
+                //Check if UART receiver has received data 
                 if(UART_PROTOCOL_PORT.IsRxReady() == true)
                 {
                     UARTProtocolRxBufferProcessing();    
@@ -196,7 +203,7 @@ void ResetPatternDetectedCallback(void)
     isResetPatternDetected = true;
 }
 
-void INT_pin1_UserInterruptHandler(void)
+void INT_PIN1_UserInterruptHandler(void)
 {
     isInterrupt1Received = true;
 }

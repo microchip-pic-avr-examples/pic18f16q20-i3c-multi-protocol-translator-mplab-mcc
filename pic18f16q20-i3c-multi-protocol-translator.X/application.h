@@ -32,12 +32,11 @@
 #define FUNCTION_ID_SIZE (1U)  
 #define I2C_ADDRESS_SIZE (1U)
 
-enum COMMAND_ID
+enum COMMAND_DEVICE_ID
 {
     I2C_CLIENT_ID = 0b000,
     UART1_DEVICE_ID = 0b01,
     UART2_DEVICE_ID = 0b10,
-    UART_INCORRECT_DEVICE_ID = 0b11,
     READ_COMMAND_ID = 0b01,
     WRITE_COMMAND_ID = 0b10,
     CLIENT_RESET_COMMAND_ID = 0b11,
@@ -52,14 +51,17 @@ enum APP_STATE
 
 enum COMMAND_INDEX
 {
-    FUNCTION_ID_INDEX = 0,
-    I2C_ADDRESS_INDEX = 1,
-    SPI_READ_BUFFER_SIZE_HIGH_INDEX = 1,
-    SPI_READ_BUFFER_SIZE_LOW_INDEX = 2,
-    CLIENT_RESET_PIN_INDEX = 1,
-    I2C_READ_BUFFER_SIZE_HIGH_INDEX = 2,
-    I2C_READ_BUFFER_SIZE_LOW_INDEX = 3,
-    UART_READ_STOP_BYTE_INDEX = 1
+    FUNCTION_ID_INDEX = 0U,
+    I2C_ADDRESS_INDEX = 1U,
+    I2C_DATA_INDEX = 2U,
+    I2C_READ_BUFFER_SIZE_HIGH_INDEX = 2U,
+    I2C_READ_BUFFER_SIZE_LOW_INDEX = 3U,
+    SPI_DATA_INDEX = 1U,
+    SPI_READ_BUFFER_SIZE_HIGH_INDEX = 1U,
+    SPI_READ_BUFFER_SIZE_LOW_INDEX = 2U,
+    CLIENT_RESET_PIN_INDEX = 1U,
+    UART_DATA_INDEX = 1U,
+    UART_READ_STOP_BYTE_INDEX = 1U
 };
 
 enum CONTROLLER_COMMAND
@@ -67,34 +69,40 @@ enum CONTROLLER_COMMAND
     I2C_WRITE_COMMAND,
     I2C_READ_COMMAND,
     UART_WRITE_COMMAND,
-    UART_READ_COMMAND,
+    SET_UART_READ_STOP_BYTE_COMMAND,
     SPI_WRITE_COMMAND,
     SPI_READ_COMMAND,
-    CLIENT_RESET_COMMAND,
+    ASSIGN_CLIENT_RESET_COMMAND,
     INCORRECT_COMMAND
 };
 
-enum ERROR_CODES
+enum I2C_ERROR_CODES
 {
     I2C_BUS_TIMEOUT_ERROR_CODE = 0x1,
-    I2C_READ_WRITE_TIMEOUT_ERROR_CODE = 0x2,
-    I2C_ADDR_NACK_ERROR_CODE = 0x3,
-    I2C_CODE_DATA_NACK_ERROR = 0x4,
-    I2C_BUS_COLLISION_ERROR_CODE = 0x5,
+    I2C_WRITE_TIMEOUT_ERROR_CODE = 0x2,
+    I2C_READ_TIMEOUT_ERROR_CODE = 0x3,
+    I2C_ADDR_NACK_ERROR_CODE = 0x4,
+    I2C_CODE_DATA_NACK_ERROR = 0x5,
+    I2C_BUS_COLLISION_ERROR_CODE = 0x6,
+};
+
+enum INTERRUPT_PINS
+{
+    INT_PIN1 = 0x1
 };
 
 enum CONTROLLER_COMMAND DecodeCommand(uint8_t functionID);
 void ExecuteI2CWriteCommand(uint8_t clientAddress, uint8_t *writeData, uint16_t writeLength);
-void ExecuteI2CReadCommand(uint8_t clientAddress, uint8_t readDataLengthHigh, uint8_t readDataLengthLow);
+void ExecuteI2CReadCommand(uint8_t clientAddress, uint16_t readDataLength);
 void ExecuteSPIWriteCommand(uint8_t functionID, uint8_t *writeData, uint16_t writeLength);
-void ExecuteSPIReadCommand(uint8_t functionID, uint8_t readDataLengthHigh, uint8_t readDataLengthLow);
+void ExecuteSPIReadCommand(uint8_t functionID, uint16_t readDataLength);
 void ExecuteUARTWriteCommand(uint8_t functionID, uint8_t *writeData, uint16_t writeLength);
-void ExecuteUARTReadCommand(uint8_t functionID, uint8_t stopByteCommandValue);
-void ExecuteClientResetCommand(uint8_t resetPinNumber);
+void ExecuteSetUARTReadStopByteCommand(uint8_t functionID, uint8_t stopByteCommandValue);
+void ExecuteAssignClientResetCommand(uint8_t resetPinNumber);
 void ExecuteResetAction(void);
 void SendAlertFromClient(uint8_t intPinNumber);
 void IBIErrorHandling(enum I3C_TARGET_IBI_REQUEST_ERROR ibiError);
-void ErrorReporting(i2c_host_error_t i2cErrorStatus);
+void I2CErrorReporting(i2c_host_error_t i2cErrorStatus);
 void UARTProtocolRxBufferProcessing(void);
 void SPI1_TxCompleteUserInterruptHandler(void);
 void SPI1_RxCompleteUserInterruptHandler(void);
