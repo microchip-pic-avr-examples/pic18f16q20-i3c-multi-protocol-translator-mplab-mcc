@@ -34,7 +34,7 @@ The below section demonstrates an application of multi-protocol translator using
 - [Curiosity Nano base board](https://www.microchip.com/development-tool/AC164162)
 - [SHT Click](https://www.mikroe.com/sht-click)
 - [OLED B Click](https://www.mikroe.com/oled-b-click)
-- [UART USB Click](https://www.mikroe.com/usb-uart-click)
+- [USB UART Click](https://www.mikroe.com/usb-uart-click)
 - Any I3C Controller
 - Logic Analyzer
 
@@ -42,7 +42,7 @@ The below section demonstrates an application of multi-protocol translator using
 
 In this example, the I3C Controller communicates to a SHT Click interfaced over I2C bus, OLED B display interfaced over SPI and the virtual serial port (CDC) of the PIC18F16Q20 Curiosity Nano on-board debugger connected to UART channel. Additionally, a USB UART Click is used to print the debug messages. The SHT click contains a SHT3x-DIS sensor which is used for measuring relative humidity and temperature. OLED B is used to display messages. The CDC interface transmits to or receives data from the I3C Controller through the UART channel of PIC18F16Q20.
 
-![Application example](images/block_diagram_example.png)
+![Application example](images/block-diagram.png)
 
 The I3C Controller must set up the I3C bus with the desired frequency. After power-up, the I3C Target makes a hot join request. It waits until the dynamic address is assigned by the Controller. Once the dynamic address is assigned, it is ready to receive commands from the Controller.
 
@@ -66,32 +66,32 @@ The I3C Controller must be aware of the I2C client address, the CS pin correspon
 
 **Note:** The SCL and SDA pins of I3C (I3C2) are powered by VDDIO3 pins. In the current firmware, Configuration Byte 7 is configured such that VDDIO3 is in the low-voltage operating range of 0.95V-1.62V.
 
-|Microcontroller Pin| Name | Description |
-|:------------------:|:-----------------:|:------:|
-| RB6| I3C2SCL | I3C bus serial clock input |
-| RB5| I32SDA | I3C bus serial data input/output |
-| RC4| TX1| UART1 transmit output pin|
-| RC5| RX1| UART1 receive input pin|
-| RA1| TX2| UART2 transmit output pin <sup>1</sup>|
-| RA5 | SCK1| SPI serial clock output|
-| RC3 | SDO1| SPI serial data out|
-| RC6 | SDI1|SPI serial data in|
-| RA4| CS1| SPI client select 1 output (Active low)|
-| RC7 | CS2|SPI client select 2 output (Active low)|
-| RB7 | CS3|SPI client select 3 output (Active low)|
-| RC0 | SCL1|I2C bus serial clock output |
-| RC1 | SDA1|I2C bus serial data input/output |
-| RA2 | INT_pin1|Interrupt pin 1 (Active high input). Interrupt occurs when there is a positive edge. |
-| RA0 |RST_pin1| Reset pin 1 (Active low output). Resets the client device by setting pin low. |
+|Microcontroller Pin| Description |
+|:------------------:|:------:|
+| RB6| I3C bus serial clock input |
+| RB5 | I3C bus serial data input/output |
+| RC4 | UART1 transmit output pin|
+| RC5| UART1 receive input pin|
+| RA1| UART2 transmit output pin <sup>1</sup>|
+| RA5 | SPI serial clock output|
+| RC3 | SPI serial data out|
+| RC6 |SPI serial data in|
+| RA4 | SPI client select 1 output (Active low)|
+| RC7 |SPI client select 2 output (Active low)|
+| RB7 |SPI client select 3 output (Active low)|
+| RC0 |I2C bus serial clock output |
+| RC1 |I2C bus serial data input/output |
+| RA2 |Interrupt pin 1 (Active high input). Interrupt occurs when there is a positive edge. |
+| RA0 |RST_PIN1| Reset pin 1 (Active low output). Resets the client device by setting pin low. |
 
 **Note:**
-1. UART2 Tx pin is also used for printing debugging messages. Connect a UART-USB converter to print the messages. Note that the receive functionality is disabled for UART2.
+1. UART2 Tx pin is used for printing debugging messages. Connect a UART-USB converter to print the messages. Note that the receive functionality is disabled for UART2.
 
 ## Setup
 
-![Hardware Setup](images/hardware_setup.jpg)
+![Hardware Setup](images/hardware-setup.png)
 
-In this example, the Curiosity Nano Base Board connects the click boards to the PIC18F16Q20 Curiosity Nano board. The OLED B Click board™ is placed in click slot one, USB UART Click is placed in click slot two and the SHT Click board™ is placed in click slot three. The on-board debugger present on Curiosity Nano board has a virtual serial port which is internally connected to UART on the PIC18F16Q20. Refer to the [Curiosity Nano board user guide](https://www.microchip.com/DS50003388) for more details on how the virtual serial ports works.
+In this example, the Curiosity Nano Base Board connects the click boards to the PIC18F16Q20 Curiosity Nano board. The OLED B Click board™ is placed in click slot one, USB UART Click is placed in click slot two and the SHT Click board™ is placed in click slot three. The on-board debugger present on Curiosity Nano board has a virtual serial port which is internally connected to UART on the PIC18F16Q20. Refer to the [Curiosity Nano board user guide](https://www.microchip.com/DS50003588) for more details on how the virtual serial ports works.
 
 Connect pin RB6 to SCL pin of I3C Controller and connect pin RB5 to SDA pin of I3C Controller. As OLED B Click does not have a INT pin, interrupt pin 1 (INT1) is used to connect interrupt from SHT Click.
 
@@ -236,14 +236,18 @@ After receiving the data, it is checked against the value of the stop command an
 To observe data transmitted or received on the virtual serial port in the Terminal window, the Curiosity Nano board needs to be connected to the terminal emulator. Data Visualizer can be used as a terminal emulator. Follow the procedure mentioned below to open the Terminal window in Data Visualizer.
 
 Open the Data Visualizer tool which is available as a plugin in MPLAB X IDE.
-1.	Open **COM7** Settings window. Set the Baud Rate to 9600.
+1.	Open **COM17** Settings window. Set the Baud Rate to 9600.
 **Note:** The COM port number can be different depending on the availability of the port.
-2.	Click the right aligned triangle symbol on **COM7** tab to start capturing.
+2.	Click the right aligned triangle symbol on **COM17** tab to start capturing.
+
+![Data visualizer](images/data-visualizer.png)
 
 ### Steps to observe debug messages
 
 To see the debug messages of a multi-protocol translator in the Terminal window, connect the UART-USB click to a serial COM port on the PC.
 Open any terminal emulator and set the baud rate of the respective serial COM port to 9600.
+
+![Terminal](images/terminal.png)
 
 **Note**: If debug messages are being printed on terminal, make sure to keep  a delay between sending commands from Controller. For faster execution of code, comment the below macro in application.c to stop printing debug messages in terminal.
 
@@ -252,7 +256,7 @@ Open any terminal emulator and set the baud rate of the respective serial COM po
 ## Peripheral Configuration Using MCC
 This section explains how to configure the peripherals using MPLAB X IDE with Melody Code Configurator (MCC) plugin to recreate this project.
 
-Refer to the [Software Used](https://github.com/microchip-pic-avr-examples/pic16f17146-force-sensing-resistor-interface-mplab-mcc#software-used) section to install the required tools to recreate the project.
+Refer to the [Software Used](https://github.com/microchip-pic-avr-examples/pic18f16q20-i3c-multi-protocol-translator-mplab-mcc#software-used) section to install the required tools to recreate the project.
 
 Additional Links: [MCC Melody Technical Reference](https://onlinedocs.microchip.com/v2/keyword-lookup?keyword=MCC.MELODY.INTRODUCTION&redirect=true)
 
