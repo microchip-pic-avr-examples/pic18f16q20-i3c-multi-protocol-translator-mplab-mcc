@@ -229,7 +229,7 @@ Open the Data Visualizer tool which is available as a plugin in MPLAB X IDE.
 To see the debug messages of a multi-protocol translator in the Terminal window, connect the UART-USB click to a serial COM port on the PC.
 Open any terminal emulator and set the baud rate of the respective serial COM port to 9600.
 
-![terminal](images/terminal.png)
+![Terminal](images/terminal.png)
 
 **Note**: If debug messages are being printed on terminal, make sure to keep  a delay between sending commands from Controller. For faster execution of code, comment the below macro in application.c to stop printing debug messages in terminal.
 
