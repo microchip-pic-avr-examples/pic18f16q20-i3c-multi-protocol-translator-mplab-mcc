@@ -3,7 +3,7 @@
 # I3C Multi-Protocol Translator Using the PIC18F16Q20 Microcontroller
 
 ## Introduction
-This example showcases how the Improved Inter-Integrated Circuit® (I3C) Target peripheral of the PIC18F16Q20 family serves as a bridge device between the I3C Controller and other devices such as: Inter-Integrated Circuit (I2C), Serial Peripheral Interface (SPI) or Universal Asynchronous Receiver Transmitter (UART). Many industries are transitioning from traditional I2C/SPI/UART communication interfaces to a simple, faster, low-power managed I3C protocol. When sensor devices communicating over multiple interfaces co-exist on the same bus, it calls for a multi-protocol translator device which connects the I2C/SPI/UART devices to an I3C bus. The application example demonstrates the implementation of a I3C multi-protocol translator using PIC1F16Q20 and various client devices.
+This example showcases how the Improved Inter-Integrated Circuit® (I3C) Target peripheral of the PIC18F16Q20 family serves as a bridge device between the I3C Controller and Inter-Integrated Circuit (I2C), Serial Peripheral Interface (SPI) or Universal Asynchronous Receiver Transmitter (UART) based devices. Many industries are transitioning from traditional I2C/SPI/UART communication interfaces to a simple, faster, low-power managed I3C protocol. When sensor devices communicating over multiple interfaces co-exist on the same bus, it calls for a multi-protocol translator device which connects the I2C/SPI/UART devices to an I3C bus. The application example demonstrates the implementation of a I3C multi-protocol translator using PIC181F16Q20 and various client devices.
 
 ## Related Documentation
 - [PIC18F16Q20 Product Page](https://www.microchip.com/product/PIC18F16Q20)
@@ -44,7 +44,7 @@ In this example, the I3C Controller communicates to a SHT Click interfaced over 
 
 ![Application example](images/block-diagram.png)
 
-The I3C Controller must set up the I3C bus with the desired frequency. After power-up, the I3C Target makes a hot join request. It waits until the dynamic address is assigned by the Controller. Once the dynamic address is assigned, it is ready to receive commands from the Controller.
+After power-up, the I3C Target makes a hot join request. It waits until the dynamic address is assigned by the Controller. Once the dynamic address is assigned, it is ready to receive commands from the Controller.
 
 The I3C Controller will initiate a Read, Write, or Reset for the I2C/SPI client devices and Read/Write to UART devices by sending certain commands to the I3C Target through a Private Write transaction. In a Private Write transaction, the first byte of payload is a Function ID. The Function ID consists of the client ID of I2C/SPI clients, device ID for UART devices and the commands.
 
@@ -54,13 +54,13 @@ The I3C Controller will initiate a Read, Write, or Reset for the I2C/SPI client 
 |:------------------|:-----------------|
 | b7: Res| Reserved |
 | b6:5: Command [1:0] |<br>00-Reserved<br>01-Read<br>10-Write<br>11-Client Reset<br> |
-| b4:3 Device ID [1:0]| <br>01 - UART1 <br> 10 - UART2|
+| b4:3 Device ID [1:0]| <br>01 - UART1 <br> 10 - UART2 <br> 11 - Invalid UART Channel selection <br> 00 - Device is I2C or SPI based on Client ID|
 | b2:0 Client ID [2:0] |<br>000– I2C device (The address of the I2C device must follow in the next byte)<br><br>001 ,010….111 – Identifier for each SPI device.<br>b0 = 1, CS1 is selected <br> b1 = 1, CS2 is selected<br> b2 = 1, CS3 is selected|
 
 PIC18F16Q20 decodes the Function ID to decide what actions to perform.
 
 **Note**:
-The I3C Controller must be aware of the I2C client address, the CS pin corresponding to SPI client, I2C/SPI client devices connected to reset and interrupt pins, the UART TX pins and the Stop byte data for UART receive operation.
+The I3C Controller must be aware of the I2C client address, the CS pin corresponding to SPI client, I2C/SPI client devices connected to reset and interrupt pins, the UART device to communicate and the Stop byte data for UART receive operation.
 
 ## Pin Connection Table
 
@@ -82,7 +82,7 @@ The I3C Controller must be aware of the I2C client address, the CS pin correspon
 | RC0 |I2C bus serial clock output |
 | RC1 |I2C bus serial data input/output |
 | RA2 |Interrupt pin 1 (Active high input). Interrupt occurs when there is a positive edge. |
-| RA0 |RST_PIN1| Reset pin 1 (Active low output). Resets the client device by setting pin low. |
+| RA0 | Reset pin 1 (Active low output). Resets the client device by setting pin low. |
 
 **Note:**
 1. UART2 Tx pin is used for printing debugging messages. Connect a UART-USB converter to print the messages. Note that the receive functionality is disabled for UART2.
@@ -91,9 +91,9 @@ The I3C Controller must be aware of the I2C client address, the CS pin correspon
 
 ![Hardware Setup](images/hardware-setup.png)
 
-In this example, the Curiosity Nano Base Board connects the click boards to the PIC18F16Q20 Curiosity Nano board. The OLED B Click board™ is placed in click slot one, USB UART Click is placed in click slot two and the SHT Click board™ is placed in click slot three. The on-board debugger present on Curiosity Nano board has a virtual serial port which is internally connected to UART on the PIC18F16Q20. Refer to the [Curiosity Nano board user guide](https://www.microchip.com/DS50003588) for more details on how the virtual serial ports works.
+In this example, the Curiosity Nano Base Board connects the click boards to the PIC18F16Q20 Curiosity Nano board. The OLED B Click board™ is placed in click slot one, USB UART Click is placed in click slot two and the SHT Click board™ is placed in click slot three. The on-board debugger present on Curiosity Nano board has a virtual serial port which is internally connected to the UART1 on the PIC18F16Q20. Refer to the [Curiosity Nano board user guide](https://www.microchip.com/DS50003588) for more details.
 
-Connect pin RB6 to SCL pin of I3C Controller and connect pin RB5 to SDA pin of I3C Controller. As OLED B Click does not have a INT pin, interrupt pin 1 (INT1) is used to connect interrupt from SHT Click.
+Connect pin RB6 to SCL pin of I3C Controller and connect pin RB5 to SDA pin of I3C Controller. The Interrupt pin 1 (RA2) is connected interrupt pin of SHT Click. The Reset pin 1 (RA0) is connected to reset pin of OLED B Click.
 
 **Note:**
 1. VDDIO3 pin of PIC18F16Q20 Curiosity Nano supplies power to I3C2 pins, which is by default at 1.2V. Therefore I3C bus operates at 1.2V. To operate I3C pins at a different voltage,  connect an external power supply to the J208 PIC18F16Q20 Curiosity Nano board. Remove R200 before connecting the external power supply to VDDIO3. The SPI and I2C bus operates at 3.3V.  
@@ -109,17 +109,13 @@ To capture temperature and humidity values from SHT3x-DIS sensor, the I3C Contro
 
 The measurement command triggers the acquisition of data pair. Each data pair consists of one 16 bit temperature and one 16 bit humidity value (in this order). After the sensor has completed the measurement, the Controller can send a command to readout measurement results. The sensor will send two bytes of data (temperature, MSB first and then LSB) followed by one byte CRC checksum and another two bytes of data (relative humidity, MSB first and then LSB) followed by one byte CRC checksum.
 
-After power-up, the INT pin on SHT Click is set high by default, which can be cleared by sending a command to clear the status register.
-
-|Sensor Command|Hex Code|
-|:-----------------:|:---------:|
-|Clear status register|0x3041|
+After power-up, the INT pin on SHT Click is set high by default, which can be cleared by sending a command (0x3041) to clear the status register.
 
 Send the command below from the I3C Controller.
 
 |Controller Operation|Data 1|Data 2|Data 3|Data 4|
 |:-----------------:|:---------:|:---------:|:---------:|:------:|
-|I2C Write|0x40|0x88|0x24|0x00|
+|I2C Write|0x40|0x88|0x30|0x41|
 
 <b>Interrupt from the SHT click (Alert Mode)</b>
 
@@ -127,12 +123,7 @@ The  INT pin of SHT click is set high when the sensor measurement crosses the th
 
 *Note*: The Alert mode is active only in Periodic Data Acquisition mode.
 
-The below commands are used to configure the set limit and clear limit of upper threshold values. Similarly, the lower threshold limit could be configured.
-
-|Sensor Command|Hex code|
-|:-----------------:|:---------:|
-|Set limit|0x611D|
-|Clear limit|0x6116|
+The upper threshold of SHT sensor is configured by sending commands to configure the set limit (0x611D) and clear limit (0x6116). Similarly, the lower threshold limits could be configured.
 
 Refer to [How to use Alert Mode of SHT3x-DIS](https://sensirion.com/media/documents/40D749F7/616400BB/Sensirion_Humidity_Sensors_SHT3x_Application_Note_Alert_Mode_DIS.pdf) to understand how to calculate the threshold limit values.
 
@@ -145,11 +136,7 @@ Send the command below from the I3C Controller to configure the upper threshold 
 
 <b>Measurement Command for Periodic Data Acquisition Mode</b>
 
-|Sensor Command|Hex Code|
-|:-----------------:|:---------:|
-|Periodic data acquisition (At 2 mps)|0x2236|
-
-Once the threshold limits are set, send the measurement command for data acquisition. In Periodic Data Acquisition mode, one issued measurement command yields a stream of data pairs. The measurement commands in this mode differs based on the  data acquisition frequency.
+Once the threshold limits are set, send the measurement command (0x2236) for data acquisition. In Periodic Data Acquisition mode, one issued measurement command yields a stream of data pairs. The measurement commands in this mode differs based on the  data acquisition frequency.
 
  Send the command below from the I3C Controller.
 
@@ -159,11 +146,7 @@ Once the threshold limits are set, send the measurement command for data acquisi
 
 <b>Readout of Measurement Results in Periodic Data Acquisition Mode</b>
 
-|Sensor Command|Hex Code|
-|:-----------------:|:---------:|
-|Fetch Command|0xE000|
-
-Transmission of the measurement data is initiated through the fetch data command. After the fetch command is sent from Controller, the result is read out by sending an I2C Read command for reading six bytes of data.
+Transmission of the measurement data is initiated through the fetch data command (0xE000). After the fetch command is sent from Controller, the result is read out by sending an I2C Read command for reading six bytes of data. Here the number of bytes to be read should be given in a 2 byte format with the high byte first followed by the low byte.
 
 |Controller Operation|Data 1|Data 2|Data 3|Data 4|
 |:-----------------:|:---------:|:---------:|:---------:|:---------:|
@@ -172,9 +155,9 @@ Transmission of the measurement data is initiated through the fetch data command
 
 ### OLED B display
 
-To initialize, OLED B display send the following command from I3C Controller. Refer to the [OLED B Data sheet](http://download.mikroe.com/documents/datasheets/MI9639BO-B_datasheet.pdf) for more details on the commands.
+The CS pin in OLED B click is connected to SPI client select 1 pin (RA4) of PIC18F16Q20 and D/C control pin is connected to SPI client select 2 pin (RC7). When sending a data, D/C control pin is set high. When sending a command, D/C pin must be set low. The client ID bits in function ID must be set appropriately based on whether data send in a SPI write must be treated as data or command.
 
-The CS pin in OLED B click is connected to SPI CS1 pin (RA4) of PIC18F16Q20 and D/C control pin is connected to SPI CS2 pin (RC7). When sending a data, D/C control pin is set high. When sending a command, D/C pin must be set low. The client ID bits in function ID must be set appropriately based on whether data send in a SPI write must be treated as data or command.
+To initialize, OLED B display send the following command from I3C Controller. Refer to the [OLED B Data sheet](http://download.mikroe.com/documents/datasheets/MI9639BO-B_datasheet.pdf) for more details on the commands.
 
 <div class="table-wrapper" markdown="block">
 
@@ -200,8 +183,6 @@ To send any characters (e.g.: send an "A") on the display, send the command in t
 |SPI Write|0x41|0xF8|-|-|
 |SPI Write|0x43|0xB0|0x12|0x05|
 |SPI Write|0x41|0x0|-|-|
-|SPI Write|0x43|0xB0|0x12|0x03|
-|SPI Write|0x41|0x24|-|-|
 
 <b> Reset OLED C display </b>
 
@@ -217,11 +198,11 @@ Followed by it, send a Target Reset Pattern with RSTACT as 0x40 (OLED B display 
 
 The virtual serial port of on-board debugger is used as the UART-based device to demonstrate communication between I3C Controller and UART channel. TX and RX pin of UART1 channel is internally connected to the on-board debugger CDC RX and CDC TX pins respectively.
 
-To transmit five characters (e.g.: a-f) from the I3C Controller to the on-board debugger RX pin, send the command below with the ASCII value of the characters.
+To transmit five characters (e.g.: A-F) from the I3C Controller to the on-board debugger RX pin, send the command below with the ASCII value of the characters.
 
-|Controller Operation|Data 1|Data 2|Data 3|Data 4|Data 5|Data 6|
-|:-----------------:|:---------:|:-------:|:---------:|:-------:|:-------:|:-------:|
-|UART Transmit|0x48|0x61|0x62|0x63|0x64|0x65|
+|Controller Operation|Data 1|Data 2|Data 3|Data 4|Data 5|Data 6|Data 7|
+|:-----------------:|:---------:|:-------:|:---------:|:-------:|:-------:|:-------:|:--------:|
+|UART Transmit|0x48|0x41|0x42|0x43|0x44|0x45|0x46|
 
 For receiving any data from the on-board debugger TX pin to the I3C Controller, first send the value of stop byte command (e.g.: 0xA ie ASCII value of LF) from the I3C Controller. It can be only once or whenever user wants to modify the Stop Byte value.
 
@@ -268,9 +249,9 @@ Additional Links: [MCC Melody Technical Reference](https://onlinedocs.microchip.
 |    I3C2_Target_DMA | *I3C2_Target_DMA Driver* <br><br> Tx DMA Channel Selection - DMA1 <br>Rx DMA Channel Selection - DMA2 <br>I3C PLIB Selector - I3C2<br><br>Transaction settings<br>Hot-Join Capable - Enable<br> Default Private Transaction Acknowledge - Not acknowledge <br><br> *I3C2PLIB* <br><br> Enable Module<br>Clock source Fosc<br>Input Buffer (SDA and SCL Pins) - I3C Low Voltage(LV) Buffer <br> <br>System Level Interrupt Settings<br>Enable General Interrupt and Reset Interrupt <br><br>*Note: All the other configurations are retained with default selections.*| Used as I3C Target|
 |    SPI1_Host               |    *SPI1_Host Driver*<br><br>User Configurations:<br>Config Name: HOST_CONFIG<br>Requested Speed: 2000 kHz <br>Mode: Mode 0<br>Data Input Sampled At: Middle<br>Clock Source Selection - Fosc<br> <br>*SPI1 PLIB*<br><br> Config Name: HOST_CONFIG, Clock Source: FOSC, Clock Frequency (Hz): 64000000              |    Used as SPI Host                                        |                             |
 |    I2C1_Host              |  *I2C1_Host Driver* <br><br>Requested Speed - 100 KHz<br><br>*I2C1_Peripheral* <br><br>Clock Source Selection - Fosc<br>Fast Mode - Standard Mode<br>Enable Interrupt Driven   |   Used as I2C host<br>   <br> |                                                              
-|    UART1                | *UART1 Driver* <br><br>Custom Name - UART_PROTOCOL_PORT<br> Requested Baudrate – 9600 <br> <br>Interrupt Settings: <br>Enable Interrupt Driven<br>Software Transmit Buffer Size - 8 <br> Software Receive Buffer Size - 8 <br><br>UART PLIB Selector – UART1<br>      <br>*UART1 PLIB*<br>   <br>Enable Transmit<br> Enable Receive<br> Enable UART<br><br>Interrupt Settings: <br>Enable Receive Interrupt<br>Enable Transmit Interrupt<br>|    Used for Transmit and Receive data from UART devices   |
+|    UART1                | *UART1 Driver* <br><br>Custom Name - UART_PROTOCOL_PORT<br> Requested Baudrate – 9600 <br> <br>Interrupt Settings: <br>Enable Interrupt Driven<br>Software Transmit Buffer Size - 8 <br> Software Receive Buffer Size - 8 <br><br>UART PLIB Selector – UART1<br>      <br>*UART1 PLIB*<br>   <br>Enable Transmit<br> Enable Receive<br> Enable UART<br><br>Interrupt Settings: <br>Enable Receive Interrupt<br>Enable Transmit Interrupt<br>|    Used to Transmit and Receive data from UART devices   |
 |    UART2                | *UART2 Driver* <br><br>Custom Name - DEBUG_PORT<br> Requested Baudrate – 9600 <br>Enable Redirect Printf to UART<br>UART PLIB Selector – UART2<br>      <br>*UART2 PLIB*<br>   <br>Enable Transmit<br> Enable UART<br>|   Send data to terminal   |
-|	 Pin Settings		  |    *Pin Grid View* <br>I3C2<br>I3C2SCL : RB6 <br>I3C2SDA : RB5<br><br>I2C1<br>SCL1 : RC0 <br>SDA1 : RC1<br><br>SPI1<br>SCK1 : RA5 <br>SDI1 : RC6<br>SDO1 : RC3<br><br>UART1<br>TX1 : RC4<br>RX1 : RC5<br>TX2 : RA1<br><br>GPIO<br> Output : RA0, RA4, RB7, RC7 <br> Input : RA2<br> <br> *Pins* <br>RA2<br>Custom Name : INT_pin1 <br>Interrupt on Change - positive<br><br>RA0<br>Custom Name : RST_pin1<br>Start High <br><br>RA4<br>Custom Name : CS1 <br>Start High<br><br>RC7<br>Custom Name : CS2 <br>Start High<br><br>RB7<br>Custom Name : CS3 <br>Start High <br>																																														|    Pin Configurations																	|
+|	 Pin Settings		  |    *Pin Grid View* <br>I3C2<br>I3C2SCL : RB6 <br>I3C2SDA : RB5<br><br>I2C1<br>SCL1 : RC0 <br>SDA1 : RC1<br><br>SPI1<br>SCK1 : RA5 <br>SDI1 : RC6<br>SDO1 : RC3<br><br>UART1<br>TX1 : RC4<br>RX1 : RC5<br>TX2 : RA1<br><br>GPIO<br> Output : RA0, RA4, RB7, RC7 <br> Input : RA2<br> <br> *Pins* <br>RA2<br>Custom Name : INT_PIN1 <br>Interrupt on Change - positive<br><br>RA0<br>Custom Name : RST_PIN1<br>Start High <br><br>RA4<br>Custom Name : CS1 <br>Start High<br><br>RC7<br>Custom Name : CS2 <br>Start High<br><br>RB7<br>Custom Name : CS3 <br>Start High <br>																																														|    Pin Configurations																	|
 | Configuration Bits        | CONFIG7 <br>VDDIO3 supply mode bit -Low-voltage Operating Range (VDDIO3 < 1.62V) <br> Update this to standard operating range if VDDIO3 > 1.62 V<br>| Configuration Register|
 
 ## Summary
