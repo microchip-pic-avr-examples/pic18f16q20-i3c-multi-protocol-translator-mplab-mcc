@@ -8,8 +8,9 @@ This example showcases how the Improved Inter-Integrated Circuit® (I3C) Target 
 ## Related Documentation
 - [PIC18F16Q20 Product Page](https://www.microchip.com/product/PIC18F16Q20)
 - [PIC18F16Q20 Data Sheet](https://www.microchip.com/DS40002387)
-- [Data Sheet SHT3x-DIS](https://download.mikroe.com/documents/datasheets/SHT31-DIS_datasheet.pdf)
+- [ SHT3x-DIS Data Sheet](https://download.mikroe.com/documents/datasheets/SHT31-DIS_datasheet.pdf)
 - [How to use Alert Mode of SHT3x-DIS](https://sensirion.com/media/documents/40D749F7/616400BB/Sensirion_Humidity_Sensors_SHT3x_Application_Note_Alert_Mode_DIS.pdf)
+- [OLED B Data Sheet](http://download.mikroe.com/documents/datasheets/MI9639BO-B_datasheet.pdf)
 
 ## Overview of Multi-Protocol Translator
 
@@ -105,7 +106,7 @@ After the I3C bus initialization, the I3C Target generates a Hot-join request to
 
 ### SHT Click
 
-To capture temperature and humidity values from SHT3x-DIS sensor, the I3C Controller must send a measurement command first. With the acknowledgement of the measurement command, the sensor starts measuring humidity and temperature. Refer to [Data Sheet of SHT3x-DIS](https://download.mikroe.com/documents/datasheets/SHT31-DIS_datasheet.pdf) for more details on the commands.
+To capture temperature and humidity values from SHT3x-DIS sensor, the I3C Controller must send a measurement command first. With the acknowledgement of the measurement command, the sensor starts measuring humidity and temperature. Refer to the [SHT3x-DIS Data Sheet](https://download.mikroe.com/documents/datasheets/SHT31-DIS_datasheet.pdf) for more details on the commands.
 
 The measurement command triggers the acquisition of data pair. Each data pair consists of one 16 bit temperature and one 16 bit humidity value (in this order). After the sensor has completed the measurement, the Controller can send a command to readout measurement results. The sensor will send two bytes of data (temperature, MSB first and then LSB) followed by one byte CRC checksum and another two bytes of data (relative humidity, MSB first and then LSB) followed by one byte CRC checksum.
 
@@ -157,7 +158,7 @@ Transmission of the measurement data is initiated through the fetch data command
 
 The CS pin in OLED B click is connected to SPI client select 1 pin (RA4) of PIC18F16Q20 and D/C control pin is connected to SPI client select 2 pin (RC7). When sending a data, D/C control pin is set high. When sending a command, D/C pin must be set low. The client ID bits in function ID must be set appropriately based on whether data send in a SPI write must be treated as data or command.
 
-To initialize, OLED B display send the following command from I3C Controller. Refer to the [OLED B Data sheet](http://download.mikroe.com/documents/datasheets/MI9639BO-B_datasheet.pdf) for more details on the commands.
+To initialize, OLED B display send the following command from I3C Controller. Refer to the [OLED B Data Sheet](http://download.mikroe.com/documents/datasheets/MI9639BO-B_datasheet.pdf) for more details on the commands.
 
 <div class="table-wrapper" markdown="block">
 
@@ -228,7 +229,7 @@ Open the Data Visualizer tool which is available as a plugin in MPLAB X IDE.
 To see the debug messages of a multi-protocol translator in the Terminal window, connect the UART-USB click to a serial COM port on the PC.
 Open any terminal emulator and set the baud rate of the respective serial COM port to 9600.
 
-![Terminal](images/terminal.png)
+![terminal](images/terminal.png)
 
 **Note**: If debug messages are being printed on terminal, make sure to keep  a delay between sending commands from Controller. For faster execution of code, comment the below macro in application.c to stop printing debug messages in terminal.
 

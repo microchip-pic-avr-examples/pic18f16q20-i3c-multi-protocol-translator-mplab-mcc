@@ -7,7 +7,7 @@
         "version": "2.0.0",
         "displayName": "I3C Multi-Protocol Translator Using PIC18F16Q20 Microcontroller",
         "projectName": "pic18f16q20-i3c-multi-protocol-translator-mplab-mcc",
-        "shortDescription": "This code example demonstrates a I3C to I2C, I3C to SPI and I3C to UART  multi-protocol translator using I3C Target peripheral of PIC microcontroller. Other compatible PIC18F-Q20 family of MCUs are: PIC18F06Q20",
+        "shortDescription": "This code example demonstrates a I3C to I2C, I3C to SPI and I3C to UART multi-protocol translator using I3C Target peripheral of PIC microcontroller. Other compatible PIC18F-Q20 family of MCUs are: PIC18F06Q20",
         "ide": {
             "name": "MPLAB X",
             "semverRange": ">=6.20.0"
