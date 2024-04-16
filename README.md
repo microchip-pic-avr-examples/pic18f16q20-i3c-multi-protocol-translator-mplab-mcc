@@ -65,7 +65,7 @@ The I3C Controller must be aware of the I2C client address, the CS pin correspon
 
 ## Pin Connection Table
 
-**Note:** The SCL and SDA pins of I3C (I3C2) are powered by VDDIO3 pins. In the current firmware, Configuration Byte 7 is configured such that VDDIO3 is in the low-voltage operating range of 0.95V-1.62V.
+**Note:** The SCL and SDA pins of I3C (I3C2) are powered by VDDIO3 pins. In the current firmware, Configuration Byte 7 is configured in such a way that VDDIO3 is in the low-voltage operating range of 0.95V-1.62V.
 
 |Microcontroller Pin| Description |
 |:------------------:|:------:|
@@ -108,7 +108,7 @@ After the I3C bus initialization, the I3C Target generates a Hot-join request to
 
 To capture temperature and humidity values from SHT3x-DIS sensor, the I3C Controller must send a measurement command first. With the acknowledgement of the measurement command, the sensor starts measuring humidity and temperature. Refer to the [SHT3x-DIS Data Sheet](https://download.mikroe.com/documents/datasheets/SHT31-DIS_datasheet.pdf) for more details on the commands.
 
-The measurement command triggers the acquisition of data pair. Each data pair consists of one 16 bit temperature and one 16 bit humidity value (in this order). After the sensor has completed the measurement, the Controller can send a command to readout measurement results. The sensor will send two bytes of data (temperature, MSB first and then LSB) followed by one byte CRC checksum and another two bytes of data (relative humidity, MSB first and then LSB) followed by one byte CRC checksum.
+The measurement command triggers the acquisition of data pair. Each data pair consists of one 16-bit temperature and one 16-bit humidity value (in this order). After the sensor has completed the measurement, the Controller can send a command to read-out the measurement results. The sensor will send two bytes of data (temperature, MSB first and then LSB) followed by one byte CRC checksum and another two bytes of data (relative humidity, MSB first and then LSB) followed by one byte CRC checksum.
 
 After power-up, the INT pin on SHT Click is set high by default, which can be cleared by sending a command (0x3041) to clear the status register.
 
@@ -118,9 +118,9 @@ Send the command below from the I3C Controller.
 |:-----------------:|:---------:|:---------:|:---------:|:------:|
 |I2C Write|0x40|0x88|0x30|0x41|
 
-<b>Interrupt from the SHT click (Alert Mode)</b>
+<b>Interrupt From the SHT Click (Alert Mode)</b>
 
-The  INT pin of SHT click is set high when the sensor measurement crosses the threshold limit. The INT pin connected to the GPIO (RA1) of PIC8F16Q20 generates an interrupt. The PIC18F16Q20 sends an IBI to Controller informing that the threshold limit is crossed.
+The  INT pin of SHT click is set high when the sensor measurement crosses the threshold limit. The INT pin connected to the GPIO (RA1) of PIC8F16Q20 generates an interrupt. The PIC18F16Q20 sends an In-Band Interrupt (IBI) to the Controller, informing it that the threshold limit is crossed.
 
 *Note*: The Alert mode is active only in Periodic Data Acquisition mode.
 
@@ -147,7 +147,7 @@ Once the threshold limits are set, send the measurement command (0x2236) for dat
 
 <b>Readout of Measurement Results in Periodic Data Acquisition Mode</b>
 
-Transmission of the measurement data is initiated through the fetch data command (0xE000). After the fetch command is sent from Controller, the result is read out by sending an I2C Read command for reading six bytes of data. Here the number of bytes to be read should be given in a 2 byte format with the high byte first followed by the low byte.
+Transmission of the measurement data is initiated through the fetch data command (0xE000). After the fetch command is sent from Controller, the result is read out by sending an I2C Read command for reading six bytes of data. Here, the number of bytes to be read must be given in a two byte format with the high byte first followed by the low byte.
 
 |Controller Operation|Data 1|Data 2|Data 3|Data 4|
 |:-----------------:|:---------:|:---------:|:---------:|:---------:|
@@ -156,7 +156,7 @@ Transmission of the measurement data is initiated through the fetch data command
 
 ### OLED B display
 
-The CS pin in OLED B click is connected to SPI client select 1 pin (RA4) of PIC18F16Q20 and D/C control pin is connected to SPI client select 2 pin (RC7). When sending a data, D/C control pin is set high. When sending a command, D/C pin must be set low. The client ID bits in function ID must be set appropriately based on whether data send in a SPI write must be treated as data or command.
+The CS pin in OLED B click is connected to SPI client select 1 pin (RA4) of PIC18F16Q20 and D/C control pin is connected to SPI client select 2 pin (RC7). When sending a data, D/C control pin is set high. When sending a command, D/C pin must be set low. Therefore, the client ID bits in function ID can be configured differently, taking into consideration the data sent in an SPI write. It can be treated as a data or a command
 
 To initialize, OLED B display send the following command from I3C Controller. Refer to the [OLED B Data Sheet](http://download.mikroe.com/documents/datasheets/MI9639BO-B_datasheet.pdf) for more details on the commands.
 
@@ -197,7 +197,7 @@ Followed by it, send a Target Reset Pattern with RSTACT as 0x40 (OLED B display 
 
 ### On-board Debugger Virtual Serial Port
 
-The virtual serial port of on-board debugger is used as the UART-based device to demonstrate communication between I3C Controller and UART channel. TX and RX pin of UART1 channel is internally connected to the on-board debugger CDC RX and CDC TX pins respectively.
+The virtual serial port of on-board debugger is used as the UART-based device to demonstrate the communication between the I3C Controller and the UART channel. TX and RX pins of the UART1 channel are internally connected to the on-board debugger CDC RX and CDC TX pins respectively.
 
 To transmit five characters (e.g.: A-F) from the I3C Controller to the on-board debugger RX pin, send the command below with the ASCII value of the characters.
 
@@ -205,7 +205,7 @@ To transmit five characters (e.g.: A-F) from the I3C Controller to the on-board 
 |:-----------------:|:---------:|:-------:|:---------:|:-------:|:-------:|:-------:|:--------:|
 |UART Transmit|0x48|0x41|0x42|0x43|0x44|0x45|0x46|
 
-For receiving any data from the on-board debugger TX pin to the I3C Controller, first send the value of stop byte command (e.g.: 0xA ie ASCII value of LF) from the I3C Controller. It can be only once or whenever user wants to modify the Stop Byte value.
+For receiving any data from the on-board debugger TX pin to the I3C Controller, first send the value of the Stop Byte command (e.g.: 0xA ie ASCII value of LF) from the I3C Controller. It can be sent only once or whenever the user want to modify the Stop Byte value.
 
 |Controller Operation|Data 1|Data 2|
 |:-----------------:|:---------:|:-------:|
@@ -213,7 +213,7 @@ For receiving any data from the on-board debugger TX pin to the I3C Controller, 
 
 After receiving the data, it is checked against the value of the stop command and stored in an application buffer. When the data received is equal to the Stop byte value, the protocol translator sends the data received until now to the I3C Controller via IBI transaction.
 
-#### Steps to observe data transaction on virtual serial port
+#### Steps to Observe Data Transaction on Virtual Serial Port
 
 To observe data transmitted or received on the virtual serial port in the Terminal window, the Curiosity Nano board needs to be connected to the terminal emulator. Data Visualizer can be used as a terminal emulator. Follow the procedure mentioned below to open the Terminal window in Data Visualizer.
 
@@ -224,7 +224,7 @@ Open the Data Visualizer tool which is available as a plugin in MPLAB X IDE.
 
 ![Data visualizer](images/data-visualizer.PNG)
 
-### Steps to observe debug messages
+### Steps to Observe Debug Messages
 
 To see the debug messages of a multi-protocol translator in the Terminal window, connect the UART-USB click to a serial COM port on the PC.
 Open any terminal emulator and set the baud rate of the respective serial COM port to 9600.
