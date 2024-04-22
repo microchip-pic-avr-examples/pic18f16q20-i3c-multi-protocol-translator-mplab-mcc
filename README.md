@@ -6,7 +6,8 @@
 This example showcases how the Improved Inter-Integrated Circuit® (I3C) Target peripheral of the PIC18F16Q20 family serves as a bridge device between the I3C Controller and Inter-Integrated Circuit (I2C), Serial Peripheral Interface (SPI) or Universal Asynchronous Receiver Transmitter (UART) based devices. Many industries are transitioning from traditional I2C/SPI/UART communication interfaces to a simple, faster, low-power managed I3C protocol. When sensor devices communicating over multiple interfaces co-exist on the same bus, it calls for a multi-protocol translator device which connects the I2C/SPI/UART devices to an I3C bus. The application example demonstrates the implementation of a I3C multi-protocol translator using PIC181F16Q20 and various client devices.
 
 ## Related Documentation
-- [PIC18F16Q20 Product Page](https://www.microchip.com/product/PIC18F16Q20)
+- [PIC18F16Q20 Product Page](https://www.microchip.com/en-us/product/PIC18F16Q20?utm_source=GitHub&utm_medium=TextLink&utm_campaign=MCU8_PIC18-Q20&utm_content=pic18f16q20-i3c-multi-protocol-translator-mplab-mcc-github&utm_bu=MCU08
+)
 - [PIC18F16Q20 Data Sheet](https://www.microchip.com/DS40002387)
 - [ SHT3x-DIS Data Sheet](https://download.mikroe.com/documents/datasheets/SHT31-DIS_datasheet.pdf)
 - [How to use Alert Mode of SHT3x-DIS](https://sensirion.com/media/documents/40D749F7/616400BB/Sensirion_Humidity_Sensors_SHT3x_Application_Note_Alert_Mode_DIS.pdf)
@@ -25,13 +26,16 @@ In this example, the I3C-I2C/SPI/UART protocol translator demonstrates the follo
 The below section demonstrates an application of multi-protocol translator using PIC18F16Q20. PIC18F16Q20 acts as a pure protocol translator transferring data between I3C Controller and the I2C/SPI/UART devices. It does not process any data received. Therefore, any generic sensors connected over I2C/SPI/UART interfaces can be used to develop  applications using this firmware. The features of multi-protocol translator may be enhanced based on the application requirement.
 
 ## Software Used
-- [MPLAB® X IDE v6.20](https://www.microchip.com/mplab/mplab-x-ide) or newer
-- [XC8 Compiler 2.46](https://www.microchip.com/mplab/compilers) or newer
+- [MPLAB® X IDE v6.20](https://www.microchip.com/en-us/tools-resources/develop/mplab-x-ide?utm_source=GitHub&utm_medium=TextLink&utm_campaign=MCU8_PIC18-Q20&utm_content=pic18f16q20-i3c-multi-protocol-translator-mplab-mcc-github&utm_bu=MCU08
+) or newer
+- [XC8 Compiler 2.46](https://www.microchip.com/en-us/tools-resources/develop/mplab-xc-compilers?utm_source=GitHub&utm_medium=TextLink&utm_campaign=MCU8_PIC18-Q20&utm_content=pic18f16q20-i3c-multi-protocol-translator-mplab-mcc-github&utm_bu=MCU08
+) or newer
 - [MPLAB® Code Configurator (MCC) 5.5.0](https://www.microchip.com/mplab/mplab-code-configurator) or newer
 - [Microchip PIC18F-Q Series Device Support 1.25.433](https://packs.download.microchip.com/) or newer
 
 ## Hardware Used
-- [PIC18F16Q20 Curiosity Nano Board](https://www.microchip.com/en-us/development-tool/EV73T25A)
+- [PIC18F16Q20 Curiosity Nano Board](https://www.microchip.com/en-us/development-tool/EV73T25A?utm_source=GitHub&utm_medium=TextLink&utm_campaign=MCU8_PIC18-Q20&utm_content=pic18f16q20-i3c-multi-protocol-translator-mplab-mcc-github&utm_bu=MCU08
+)
 - [Curiosity Nano base board](https://www.microchip.com/development-tool/AC164162)
 - [SHT Click](https://www.mikroe.com/sht-click)
 - [OLED B Click](https://www.mikroe.com/oled-b-click)
